@@ -45,6 +45,22 @@ body {
   width: 100%;
 }
 
+.page-will-container {
+  background-image: url("./components/images/will.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.page-done-container {
+  background-image: url("./components/images/done.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
 .choose-container {
   height: 100%;
   display: grid;
@@ -68,6 +84,7 @@ body {
 
 .back-choose:hover {
   background-color: white;
+  cursor: pointer;
 }
 
 .choose-container > #wrap-choose {

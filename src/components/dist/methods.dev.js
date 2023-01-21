@@ -1,24 +1,31 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
-  value: true,
+  value: true
 });
-exports.fieldsetCreate =
-  exports.inputCreate =
-  exports.pCreate =
-  exports.h5Create =
-  exports.h4Create =
-  exports.h3Create =
-  exports.h2Create =
-  exports.h1Create =
-  exports.ImgCreate =
-  exports.navCreate =
-  exports.divCreate =
-    void 0;
+exports.fieldsetCreate = exports.inputCreate = exports.pCreate = exports.h5Create = exports.h4Create = exports.h3Create = exports.h2Create = exports.h1Create = exports.ImgCreate = exports.navCreate = exports.divCreate = exports.methodCreate = void 0;
 
 // Made by MrEpoch
 // This file was made to be exported for use in other files, it holds methods for creating html elements in easier way
 // divCreate function expression takes like first what is inside and then class and returns div at end
+var methodCreate = function methodCreate(htmlName, inside, classAdd, idAdd, innerHtml) {
+  var element = document.createElement(htmlName);
+  element.append(inside);
+  element.classList.add(classAdd);
+
+  if (idAdd) {
+    element.id = idAdd;
+  }
+
+  if (innerHtml) {
+    element.innerHTML = innerHtml;
+  }
+
+  return element;
+};
+
+exports.methodCreate = methodCreate;
+
 var divCreate = function divCreate(InsideDiv, classAdd, idAdd, innerHtml) {
   var div = document.createElement("div");
   div.append(InsideDiv);
@@ -49,6 +56,7 @@ var navCreate = function navCreate(InsideNav, classAdd, idAdd) {
   return nav;
 }; // ImgCreate is returns takes Imported img and returns it ready for use to append to the div or other use
 
+
 exports.navCreate = navCreate;
 
 var ImgCreate = function ImgCreate(image) {
@@ -56,6 +64,7 @@ var ImgCreate = function ImgCreate(image) {
   img.src = image;
   return img;
 }; // h2Create creates h2 element which takes textContent and class and returns h2
+
 
 exports.ImgCreate = ImgCreate;
 
@@ -99,6 +108,7 @@ var h3Create = function h3Create(TextInside, classAdd, idAdd) {
   return h3;
 }; // h4Create creates h4 element which takes textContent and class and returns h4
 
+
 exports.h3Create = h3Create;
 
 var h4Create = function h4Create(TextInside, classAdd, idAdd) {
@@ -126,6 +136,7 @@ var h5Create = function h5Create(TextInside, classAdd, idAdd) {
 
   return h5;
 }; // pCreate creates paragrahp with first parameter text and second class and returns paragraph
+
 
 exports.h5Create = h5Create;
 
@@ -164,5 +175,6 @@ var fieldsetCreate = function fieldsetCreate(InsideField, classAdd, idAdd) {
 
   return field;
 }; // exporting all function expressions
+
 
 exports.fieldsetCreate = fieldsetCreate;

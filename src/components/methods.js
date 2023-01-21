@@ -4,6 +4,19 @@
 
 // divCreate function expression takes like first what is inside and then class and returns div at end
 
+const methodCreate = (htmlName, inside, classAdd, idAdd, innerHtml) => {
+  const element = document.createElement(htmlName);
+  element.append(inside);
+  element.classList.add(classAdd);
+  if (idAdd) {
+    element.id = idAdd;
+  }
+  if (innerHtml) {
+    element.innerHTML = innerHtml;
+  }
+  return element;
+}
+
 const divCreate = (InsideDiv, classAdd, idAdd, innerHtml) => {
   const div = document.createElement("div");
   div.append(InsideDiv);
@@ -123,6 +136,7 @@ const fieldsetCreate = (InsideField, classAdd, idAdd) => {
 // exporting all function expressions
 
 export {
+  methodCreate,
   divCreate,
   navCreate,
   ImgCreate,
