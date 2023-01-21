@@ -15,7 +15,7 @@ const methodCreate = (htmlName, inside, classAdd, idAdd, innerHtml) => {
     element.innerHTML = innerHtml;
   }
   return element;
-}
+};
 
 const divCreate = (InsideDiv, classAdd, idAdd, innerHtml) => {
   const div = document.createElement("div");

@@ -39,7 +39,7 @@ const SvgPict = () => {
                     </svg>`;
   const returnIcon = `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"> </path>
-                      </svg>`
+                      </svg>`;
   return { plusIcon, returnIcon };
 };
 
@@ -76,55 +76,111 @@ const content = () => {
   return myContent;
 };
 
-const doingPage = () => {
-  const page = methods.divCreate("", "page-doing-container", "doing");
-  const field = methods.fieldsetCreate("", "field-doing");
-  const returnBtn = methods.divCreate("", "return-doing", "", SvgPict().returnIcon);
-
+const TodoName = (pageName) => {
   const TodoNameContainer = methods.divCreate("", "projNameContainer");
-  const TodoNameLabel = methods.methodCreate("label", "Todo name", "label-doing-name");
-  const TodoNameInput = methods.inputCreate("My awesome project!", "name-doing", );
-  
-  const TodoTimeContainer = methods.divCreate("", "projTimeContainer")
-  const TodoTimeLabel = methods.methodCreate("label", "Completion date", "label-doing-time");
-  const TodoTimeInput = methods.inputCreate("", "doing-time","date")
+  const TodoNameLabel = methods.methodCreate(
+    "label",
+    "Todo name",
+    `label-${pageName}-name`
+  );
+  const TodoNameInput = methods.inputCreate(
+    "My awesome project!",
+    "name-doing"
+  );
 
-
-  const TodoTextContainer = methods.divCreate("", "projTextContainer");
-  const TodoText = methods.methodCreate("textarea", "", "projText");
-
-  
   TodoNameContainer.append(TodoNameLabel, TodoNameInput);
+
+  return TodoNameContainer;
+};
+
+const TodoTime = (pageName) => {
+  const TodoTimeContainer = methods.divCreate("", "projTimeContainer");
+  const TodoTimeLabel = methods.methodCreate(
+    "label",
+    "Completion Time",
+    `label-${pageName}-time`
+  );
+  const TodoTimeInput = methods.inputCreate("", `${pageName}-time`, "time");
+
   TodoTimeContainer.append(TodoTimeLabel, TodoTimeInput);
-  TodoTextContainer.append(TodoText);
 
-  field.append(TodoNameContainer, TodoTimeContainer, TodoTextContainer);
+  return TodoTimeContainer;
+};
+const TodoDate = (pageName) => {
+  const TodoDateContainer = methods.divCreate("", "projDateContainer");
+  const TodoDateLabel = methods.methodCreate(
+    "label",
+    "Completion date",
+    `label-${pageName}-date`
+  );
+  const TodoDateInput = methods.inputCreate("", `${pageName}-date`, "date");
 
-  page.append(returnBtn, field);
-  return page;
+  TodoDateContainer.append(TodoDateLabel, TodoDateInput);
+
+  return TodoDateContainer;
+};
+const TodoText = (pageName) => {
+  const TodoTextContainer = methods.divCreate("", "projTextContainer");
+  const TodoTextInside = methods.methodCreate(
+    "textarea",
+    "",
+    `${pageName}-projText`
+  );
+
+  TodoTextContainer.append(TodoTextInside);
+
+  return TodoTextContainer;
+};
+const TodoSubmit = (pageName) => {
+  const submitBtn = methods.methodCreate(
+    "button",
+    "submit",
+    `${pageName}-btn`,
+    "submitBtn"
+  );
+
+  const wrappedBtn = methods.divCreate(submitBtn, "submit-btn-container");
+
+  return wrappedBtn;
+};
+
+function WritingPages(pageName) {
+  this.page = methods.divCreate(
+    "",
+    `page-${pageName}-container`,
+    `${pageName}`
+  );
+  this.field = methods.fieldsetCreate("", `field-${pageName}`);
+  this.returnBtn = methods.divCreate(
+    "",
+    `return-${pageName}`,
+    "return-text",
+    SvgPict().returnIcon
+  );
+
+  this.field.append(
+    TodoName(`${pageName}`),
+    TodoTime(`${pageName}`),
+    TodoDate(`${pageName}`),
+    TodoText(`${pageName}`)
+  );
+  this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
+}
+
+const doingPage = () => {
+  const MyPage = new WritingPages("doing");
+  return MyPage.page;
 };
 
 const willPage = () => {
-  const page = methods.divCreate("", "page-will-container", "will");
-  const field = methods.fieldsetCreate("", "field-will");
-  const TodoNameContainer = methods.divCreate("", "projNameContainer")
-  const TodoNameLabel = methods.methodCreate("label", "Todo name");
-  const TodoNameInput = methods.inputCreate("My awesome project!", );
-
-
-  return page;
-}
+  const MyPage = new WritingPages("will");
+  return MyPage.page;
+};
 
 const donePage = () => {
-  const page = methods.divCreate("", "page-done-container", "done");
-  const field = methods.fieldsetCreate("", "field-done");
-  const TodoNameContainer = methods.divCreate("", "projNameContainer")
-  const TodoNameLabel = methods.methodCreate("label", "Todo name");
-  const TodoNameInput = methods.inputCreate("My awesome project!", );
-
-
-  return page;
-}
+  const MyPage = new WritingPages("done");
+  return MyPage.page;
+};
 
 const chooseContent = () => {
   const choose = methods.divCreate("", "choose-container", "choose");
@@ -151,7 +207,12 @@ const chooseContent = () => {
   const doingWrap = methods.divCreate(doingChoose, "doing-wrap", "wrap-choose");
   const willWrap = methods.divCreate(willDoChoose, "will-wrap", "wrap-choose");
   const doneWrap = methods.divCreate(doneChoose, "done-wrap", "wrap-choose");
-  const back = methods.divCreate("", "back-choose", "", SvgPict().returnIcon);
+  const back = methods.divCreate(
+    "",
+    "back-choose",
+    "return-text",
+    SvgPict().returnIcon
+  );
 
   choose.append(doingWrap, willWrap, doneWrap, back);
 
@@ -179,40 +240,34 @@ src.append(main);
 
 const addBtn = checkPage(src).btnLogic;
 
-
 addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(chooseContent());
-
 
   const returnBtn = checkPage(src).btnLogic;
   returnBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(main);
   });
-  
+
   const doingBtn = checkPage(src).doingBtn;
   doingBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(doingPage());
-  })
+  });
 
   const willBtn = checkPage(src).willBtn;
   willBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(willPage());
-  })
+  });
 
   const doneBtn = checkPage(src).doneBtn;
   doneBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(donePage());
-  })
+  });
 });
-
-// const check = (value) => {
-//   if(value.children["0"].id === "main")
-// }
 
 document.body.appendChild(src);
