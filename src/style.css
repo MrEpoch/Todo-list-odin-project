@@ -37,6 +37,14 @@ body {
   grid-template: 0.5fr 3fr / 1fr;
 }
 
+.page-doing-container {
+  background-image: url("./components/images/doing.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
 .choose-container {
   height: 100%;
   display: grid;
@@ -45,13 +53,30 @@ body {
   align-items: center;
 }
 
-.choose-container > div {
+.back-choose {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.552);
+  border-radius: 50px;
+}
+
+.back-choose:hover {
+  background-color: white;
+}
+
+.choose-container > #wrap-choose {
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.choose-container > div > div {
+#wrap-choose > div {
   border: 2px solid black;
   width: 160px;
   height: 60px;
@@ -62,7 +87,7 @@ body {
   background-color: white;
 }
 
-.choose-container > div > div:hover {
+#wrap-choose > div:hover {
   background-color: rgba(224, 221, 221, 0.627);
   cursor: pointer;
 }

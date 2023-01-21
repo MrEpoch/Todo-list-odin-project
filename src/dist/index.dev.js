@@ -71,12 +71,33 @@ function _interopRequireWildcard(obj) {
 
 var src = methods.divCreate("", "src");
 
+var checkPage = function checkPage(value) {
+  var currentPage = value.children["0"].id;
+  var btnLogic;
+
+  if (currentPage === "main") {
+    btnLogic = value.children["0"].children["1"].children["3"];
+  } else if (currentPage === "choose") {
+    btnLogic = value.children["0"].children["3"];
+  }
+
+  return btnLogic;
+};
+
+var currentPage; //
+
 var navbar = function navbar() {
   var myNavbar = methods.navCreate("", "navbar");
   var projectsHeader = methods.h3Create("Projects", "navbar-h3-projects");
   var projectsDiv = methods.divCreate(projectsHeader, "navbar-div-projects");
   myNavbar.append(projectsDiv);
   return myNavbar;
+};
+
+var plusSvg = function plusSvg() {
+  var plusIcon =
+    '<svg viewBox="0 0 26 26">\n                      <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"> </path>\n                    </svg>';
+  return plusIcon;
 };
 
 var content = function content() {
@@ -91,31 +112,35 @@ var content = function content() {
     doingH4: methods.h4Create("Doing", "doing-content"),
     willH4: methods.h4Create("Will do", "will-do-content"),
     doneH4: methods.h4Create("Done", "done-content"),
-    addSvg:
-      '<svg viewBox="0 0 26 26">\n              <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"> </path>\n            </svg>',
   };
   var doing = Card(cardsInner.doingH4);
   var will = Card(cardsInner.willH4);
   var done = Card(cardsInner.doneH4);
-  var add = methods.divCreate("", "add-item");
-  add.innerHTML = cardsInner.addSvg;
+  var add = methods.divCreate("", "add-item", "", plusSvg());
   myContent.append(doing, will, done, add);
   var addHtml = myContent.children["3"];
   addHtml.addEventListener("mouseover", function () {
     addHtml.textContent = "New";
   });
   addHtml.addEventListener("mouseout", function () {
-    addHtml.innerHTML = cardsInner.addSvg;
+    addHtml.innerHTML = plusSvg();
   });
   return myContent;
 };
 
+var doingPage = function doingPage() {
+  var page = methods.divCreate("", "page-doing-container", "doing");
+  var field = methods.fieldsetCreate("", "field-doing");
+  return page;
+};
+
 var chooseContent = function chooseContent() {
-  var choose = methods.divCreate("", "choose-container");
+  var choose = methods.divCreate("", "choose-container", "choose");
   var chooseText = {
     doing: "Doing",
     will: "Will do",
     done: "Done",
+    back: '<svg style="width:24px;height:24px" viewBox="0 0 24 24">\n              <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"> </path>\n          </svg>',
   };
   var doingChoose = methods.divCreate(
     methods.h3Create(chooseText.doing, "doing-choose-h3"),
@@ -129,15 +154,22 @@ var chooseContent = function chooseContent() {
     methods.h3Create(chooseText.done, "done-choose-h3"),
     "done-choose-div"
   );
-  var doingWrap = methods.divCreate(doingChoose, "doing-wrap");
-  var willWrap = methods.divCreate(willDoChoose, "will-wrap");
-  var doneWrap = methods.divCreate(doneChoose, "done-wrap");
-  choose.append(doingWrap, willWrap, doneWrap);
+  var doingWrap = methods.divCreate(doingChoose, "doing-wrap", "wrap-choose");
+  var willWrap = methods.divCreate(willDoChoose, "will-wrap", "wrap-choose");
+  var doneWrap = methods.divCreate(doneChoose, "done-wrap", "wrap-choose");
+  var back = methods.divCreate("", "back-choose", "", chooseText.back);
+  choose.append(doingWrap, willWrap, doneWrap, back);
   return choose;
-};
+}; //
+
+var verify = function verify() {};
 
 var errorMess = "Please restart page or contact support!";
-var main = methods.divCreate(methods.h1Create(errorMess, "error"), "main");
+var main = methods.divCreate(
+  methods.h1Create(errorMess, "error"),
+  "main",
+  "main"
+);
 
 if (navbar() && content()) {
   main.innerHTML = "";
@@ -148,10 +180,21 @@ if (navbar() && content()) {
   );
 }
 
-var addBtn = main.children["1"].children["3"];
+src.append(main);
+var addBtn = checkPage(src);
 addBtn.addEventListener("click", function () {
+  addBtn.innerHTML = plusSvg();
   src.innerHTML = "";
   src.append(chooseContent());
-});
-src.append(main);
+  currentPage = src.innerHTML;
+  var returnBtn = checkPage(src);
+  returnBtn.addEventListener("click", function () {
+    src.innerHTML = "";
+    src.append(main);
+    returnBtn = "";
+  });
+}); // const check = (value) => {
+//   if(value.children["0"].id === "main")
+// }
+
 document.body.appendChild(src);
