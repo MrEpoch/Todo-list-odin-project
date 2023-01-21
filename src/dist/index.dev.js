@@ -22,6 +22,8 @@ var methods = _interopRequireWildcard(require("./components/methods"));
 
 require("./style.css");
 
+require("./components/fonts/Demiths-L3oRZ.otf");
+
 function _getRequireWildcardCache() {
   if (typeof WeakMap !== "function") return null;
   var cache = new WeakMap();
@@ -71,8 +73,9 @@ var src = methods.divCreate("", "src");
 
 var navbar = function navbar() {
   var myNavbar = methods.navCreate("", "navbar");
-  var projects = methods.h4Create("Projects", "navbar-h4-projects");
-  myNavbar.append(projects);
+  var projectsHeader = methods.h3Create("Projects", "navbar-h3-projects");
+  var projectsDiv = methods.divCreate(projectsHeader, "navbar-div-projects");
+  myNavbar.append(projectsDiv);
   return myNavbar;
 };
 
@@ -89,7 +92,7 @@ var content = function content() {
     willH4: methods.h4Create("Will do", "will-do-content"),
     doneH4: methods.h4Create("Done", "done-content"),
     addSvg:
-      '<svg viewBox="0 0 26 26">\n    <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"> </path>\n</svg>',
+      '<svg viewBox="0 0 26 26">\n              <path fill="currentColor" d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z"> </path>\n            </svg>',
   };
   var doing = Card(cardsInner.doingH4);
   var will = Card(cardsInner.willH4);
@@ -97,10 +100,58 @@ var content = function content() {
   var add = methods.divCreate("", "add-item");
   add.innerHTML = cardsInner.addSvg;
   myContent.append(doing, will, done, add);
+  var addHtml = myContent.children["3"];
+  addHtml.addEventListener("mouseover", function () {
+    addHtml.textContent = "New";
+  });
+  addHtml.addEventListener("mouseout", function () {
+    addHtml.innerHTML = cardsInner.addSvg;
+  });
   return myContent;
 };
 
-var swap = methods.divCreate("", "swap");
-swap.append(navbar(), content());
-src.append(swap);
+var chooseContent = function chooseContent() {
+  var choose = methods.divCreate("", "choose-container");
+  var chooseText = {
+    doing: "Doing",
+    will: "Will do",
+    done: "Done",
+  };
+  var doingChoose = methods.divCreate(
+    methods.h3Create(chooseText.doing, "doing-choose-h3"),
+    "doing-choose-div"
+  );
+  var willDoChoose = methods.divCreate(
+    methods.h3Create(chooseText.will, "will-choose-h3"),
+    "will-choose-div"
+  );
+  var doneChoose = methods.divCreate(
+    methods.h3Create(chooseText.done, "done-choose-h3"),
+    "done-choose-div"
+  );
+  var doingWrap = methods.divCreate(doingChoose, "doing-wrap");
+  var willWrap = methods.divCreate(willDoChoose, "will-wrap");
+  var doneWrap = methods.divCreate(doneChoose, "done-wrap");
+  choose.append(doingWrap, willWrap, doneWrap);
+  return choose;
+};
+
+var errorMess = "Please restart page or contact support!";
+var main = methods.divCreate(methods.h1Create(errorMess, "error"), "main");
+
+if (navbar() && content()) {
+  main.innerHTML = "";
+  main.append(navbar(), content());
+} else {
+  console.error(
+    "***  navbar() or content() didn't return expected value!  ***"
+  );
+}
+
+var addBtn = main.children["1"].children["3"];
+addBtn.addEventListener("click", function () {
+  src.innerHTML = "";
+  src.append(chooseContent());
+});
+src.append(main);
 document.body.appendChild(src);

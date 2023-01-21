@@ -7,6 +7,13 @@
 :root {
 }
 
+@font-face {
+  font-family: "Demiths";
+  src: local("Demiths"),
+    url("./components/fonts/Demiths-L3oRZ.otf") format("OpenType");
+  font-weight: bold;
+}
+
 html,
 body {
   height: 100%;
@@ -20,7 +27,7 @@ body {
   height: 100%;
 }
 
-.swap {
+.main {
   width: 100%;
   height: 100%;
   background-image: url("./components/images/background.jpg");
@@ -28,6 +35,82 @@ body {
   background-position: center;
   display: grid;
   grid-template: 0.5fr 3fr / 1fr;
+}
+
+.choose-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  align-items: center;
+}
+
+.choose-container > div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.choose-container > div > div {
+  border: 2px solid black;
+  width: 160px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+
+.choose-container > div > div:hover {
+  background-color: rgba(224, 221, 221, 0.627);
+  cursor: pointer;
+}
+
+.doing-wrap {
+  background-image: url("./components/images/doing.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.will-wrap {
+  background-image: url("./components/images/will.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.done-wrap {
+  background-image: url("./components/images/done.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.navbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.navbar > .navbar-div-projects {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 15px;
+}
+
+.navbar-div-projects > .navbar-h3-projects {
+  font-family: "Demiths";
+  font-size: 24px;
+  letter-spacing: 0.7px;
+  border-bottom: 2px solid black;
+  border-radius: 5px;
 }
 
 .content-cards {
@@ -41,13 +124,38 @@ body {
   background-color: white;
   width: 23%;
   height: 67%;
-  border-radius: 30px;
+  border-radius: 25px;
   padding: 20px;
+  border: 2px solid black;
+}
+
+.card > h4 {
+  font-family: "Demiths";
+  font-size: 15px;
+  border-bottom: 2px solid black;
+  border-radius: 10px;
+  width: 80px;
+  text-align: center;
 }
 
 .add-item {
   position: absolute;
-  right: 30px;
+  right: 35px;
+  top: 140px;
+  background-color: #fafafa;
+  border: 2px solid rgba(215, 205, 205, 0.795);
+  width: 60px;
+  height: 60px;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Demiths";
+}
+
+.add-item:hover {
+  background-color: #ded8d8;
+  cursor: pointer;
 }
 
 .add-item > svg {
