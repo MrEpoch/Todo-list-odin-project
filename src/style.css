@@ -44,6 +44,32 @@ body {
   grid-template-rows: 1fr 3fr 2fr;
 }
 
+#doing > fieldset,
+#will > fieldset,
+#done > fieldset {
+  grid-row: 2 / 3 ;
+  width: 35%;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  background-color: white;
+}
+
+.projNameContainer {
+  padding: 10px;
+}
+
+.projNameContainer > label {
+  padding-right: 30px;
+}
+
+input[type="text"] {
+  width: 250px;
+  height: 30px;
+}
+
+
 .page-doing-container {
   background-image: url("./components/images/doing.jpg");
   background-position: center;

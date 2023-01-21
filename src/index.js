@@ -7,19 +7,23 @@ const src = methods.divCreate("", "src");
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
   let btnLogic;
-  let doingBtn;
-  let willBtn;
-  let doneBtn;
+  let doingBtns;
+  let willBtns;
+  let doneBtns;
+  let submitBtns;
   if (currentPage === "main") {
     btnLogic = value.children["0"].children["1"].children["3"];
-    doingBtn = value.children["0"].children["3"];
+    doingBtns = value.children["0"].children["3"];
   } else if (currentPage === "choose") {
     btnLogic = value.children["0"].children["3"];
-    doingBtn = value.children["0"].children["0"].children["0"];
-    willBtn = value.children["0"].children["1"].children["0"];
-    doneBtn = value.children["0"].children["2"].children["0"];
+    doingBtns = value.children["0"].children["0"].children["0"];
+    willBtns = value.children["0"].children["1"].children["0"];
+    doneBtns = value.children["0"].children["2"].children["0"];
+  } else if (currentPage === "doing") {
+    btnLogic = value.children["0"];
+    submitBtns = value.children["0"];
   }
-  return { btnLogic, doingBtn, willBtn, doneBtn };
+  return { btnLogic, doingBtns, willBtns, doneBtns };
 };
 
 //
@@ -85,7 +89,8 @@ const TodoName = (pageName) => {
   );
   const TodoNameInput = methods.inputCreate(
     "My awesome project!",
-    "name-doing"
+    "name-doing",
+    "text"
   );
 
   TodoNameContainer.append(TodoNameLabel, TodoNameInput);
@@ -220,7 +225,8 @@ const chooseContent = () => {
 };
 
 //
-const verify = () => {};
+
+
 const errorMess = "Please restart page or contact support!";
 const main = methods.divCreate(
   methods.h1Create(errorMess, "error"),
@@ -251,19 +257,19 @@ addBtn.addEventListener("click", () => {
     src.append(main);
   });
 
-  const doingBtn = checkPage(src).doingBtn;
+  const doingBtn = checkPage(src).doingBtns;
   doingBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(doingPage());
   });
 
-  const willBtn = checkPage(src).willBtn;
+  const willBtn = checkPage(src).willBtns;
   willBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(willPage());
   });
 
-  const doneBtn = checkPage(src).doneBtn;
+  const doneBtn = checkPage(src).doneBtns;
   doneBtn.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(donePage());
