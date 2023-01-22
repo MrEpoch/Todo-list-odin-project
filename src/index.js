@@ -7,23 +7,24 @@ const src = methods.divCreate("", "src");
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
   let btnLogic;
-  let doingBtns;
-  let willBtns;
-  let doneBtns;
   let submitBtns;
+  const pageBtns = {};
   if (currentPage === "main") {
     btnLogic = value.children["0"].children["1"].children["3"];
-    doingBtns = value.children["0"].children["3"];
   } else if (currentPage === "choose") {
     btnLogic = value.children["0"].children["3"];
-    doingBtns = value.children["0"].children["0"].children["0"];
-    willBtns = value.children["0"].children["1"].children["0"];
-    doneBtns = value.children["0"].children["2"].children["0"];
-  } else if (currentPage === "doing") {
-    btnLogic = value.children["0"];
-    submitBtns = value.children["0"];
+    pageBtns.doingBtns = value.children["0"].children["0"].children["0"];
+    pageBtns.willBtns = value.children["0"].children["1"].children["0"];
+    pageBtns.doneBtns = value.children["0"].children["2"].children["0"];
+  } else if (
+    currentPage === "doing" ||
+    currentPage === "will" ||
+    currentPage === "done"
+  ) {
+    btnLogic = value.children["0"].children["0"];
+    submitBtns = value.children["0"].children["2"].children["0"];
   }
-  return { btnLogic, doingBtns, willBtns, doneBtns };
+  return { btnLogic, pageBtns, submitBtns };
 };
 
 //
@@ -226,6 +227,15 @@ const chooseContent = () => {
 
 //
 
+const returnBtn = (value) => {
+  const returnBtns = checkPage(src).btnLogic;
+  returnBtns.addEventListener("click", () => {
+    src.innerHTML = "";
+    src.append(value);
+  });
+
+  return returnBtns;
+};
 
 const errorMess = "Please restart page or contact support!";
 const main = methods.divCreate(
@@ -242,6 +252,21 @@ if (navbar() && content()) {
   );
 }
 
+const pageLoader = (btn, page, value) => {
+  if (
+    value.children["0"].id !== "main" ||
+    value.children["0"].id !== "choose"
+  ) {
+    let parameter = btn;
+    const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
+    Loadedpage.addEventListener("click", () => {
+      src.innerHTML = "";
+      src.append(page);
+      returnBtn(main);
+    });
+  }
+};
+
 src.append(main);
 
 const addBtn = checkPage(src).btnLogic;
@@ -251,29 +276,13 @@ addBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(chooseContent());
 
-  const returnBtn = checkPage(src).btnLogic;
-  returnBtn.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(main);
-  });
+  returnBtn(main);
 
-  const doingBtn = checkPage(src).doingBtns;
-  doingBtn.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(doingPage());
-  });
+  pageLoader("doing", doingPage(), src);
 
-  const willBtn = checkPage(src).willBtns;
-  willBtn.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(willPage());
-  });
+  pageLoader("will", willPage(), src);
 
-  const doneBtn = checkPage(src).doneBtns;
-  doneBtn.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(donePage());
-  });
+  pageLoader("done", donePage(), src);
 });
 
 document.body.appendChild(src);
