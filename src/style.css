@@ -1,0 +1,304 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+}
+
+@font-face {
+  font-family: "Demiths";
+  src: local("Demiths"),
+    url("./components/fonts/Demiths-L3oRZ.otf") format("OpenType");
+  font-weight: bold;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+.src {
+  width: 100%;
+  height: 100%;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  background-image: url("./components/images/background.jpg");
+  background-size: cover;
+  background-position: center;
+  display: grid;
+  grid-template: 0.5fr 3fr / 1fr;
+}
+
+#doing,
+#will,
+#done {
+  display: grid;
+  grid-template-rows: 1fr 3.5fr 1fr;
+}
+
+#doing > fieldset,
+#will > fieldset,
+#done > fieldset {
+  grid-row: 2 / 3;
+  width: 40%;
+  height: 100%;
+  justify-self: center;
+  display: grid;
+  grid-template-rows: repeat(3, 1fr) 3fr;
+  background-color: white;
+}
+
+.projNameContainer,
+.projTimeContainer,
+.projDateContainer {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+}
+
+.projNameContainer > label {
+  padding-right: 30px;
+}
+
+input[type="text"] {
+  width: 250px;
+  height: 30px;
+}
+
+input[type="time"] {
+  width: 80px;
+  height: 30px;
+}
+
+input[type="date"] {
+  width: 120px;
+  height: 30px;
+}
+
+.projTextContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+textarea {
+  justify-self: center;
+  resize: none;
+  width: 420px;
+  height: 180px;
+  padding: 10px;
+}
+
+.projTimeContainer > label {
+  padding-right: 30px;
+}
+
+.page-doing-container {
+  background-image: url("./components/images/doing.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+#return-text {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  background-color: rgba(255, 255, 255, 0.548);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+}
+
+#return-text:hover {
+  background-color: white;
+}
+
+.submit-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#submitBtn {
+  background-color: transparent;
+  border: 3px solid black;
+  border-radius: 10px;
+  width: 120px;
+  height: 40px;
+  align-self: center;
+}
+
+#submitBtn:hover {
+  background-color: grey;
+}
+
+.page-will-container {
+  background-image: url("./components/images/will.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.page-done-container {
+  background-image: url("./components/images/done.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.choose-container {
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  justify-items: center;
+  align-items: center;
+}
+
+.back-choose {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.552);
+  border-radius: 50px;
+}
+
+.back-choose:hover {
+  background-color: white;
+  cursor: pointer;
+}
+
+.choose-container > #wrap-choose {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#wrap-choose > div {
+  border: 2px solid black;
+  width: 160px;
+  height: 60px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+}
+
+#wrap-choose > div:hover {
+  background-color: rgba(224, 221, 221, 0.627);
+  cursor: pointer;
+}
+
+.doing-wrap {
+  background-image: url("./components/images/doing.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.will-wrap {
+  background-image: url("./components/images/will.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.done-wrap {
+  background-image: url("./components/images/done.jpg");
+  background-position: center;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.navbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.navbar > .navbar-div-projects {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 15px;
+}
+
+.navbar-div-projects > .navbar-h3-projects {
+  font-family: "Demiths";
+  font-size: 24px;
+  letter-spacing: 0.7px;
+  border-bottom: 2px solid black;
+  border-radius: 5px;
+}
+
+.content-cards {
+  display: flex;
+  justify-content: space-around;
+  width: 90%;
+  height: 100%;
+}
+
+.card {
+  background-color: white;
+  width: 23%;
+  height: 67%;
+  border-radius: 25px;
+  padding: 20px;
+  border: 2px solid black;
+}
+
+.card > h4 {
+  font-family: "Demiths";
+  font-size: 15px;
+  border-bottom: 2px solid black;
+  border-radius: 10px;
+  width: 80px;
+  text-align: center;
+}
+
+.add-item {
+  position: absolute;
+  right: 35px;
+  top: 140px;
+  background-color: #fafafa;
+  border: 2px solid rgba(215, 205, 205, 0.795);
+  width: 60px;
+  height: 60px;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Demiths";
+}
+
+.add-item:hover {
+  background-color: #ded8d8;
+  cursor: pointer;
+}
+
+.add-item > svg {
+  height: 50px;
+  width: 50px;
+}
