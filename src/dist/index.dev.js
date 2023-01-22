@@ -71,6 +71,54 @@ function _interopRequireWildcard(obj) {
 
 var src = methods.divCreate("", "src");
 
+if (!localStorage.getItem("Id")) {
+  localStorage.setItem("Id", "0");
+}
+
+function storageAvailable(type) {
+  var storage;
+
+  try {
+    storage = window[type];
+    var x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException && // everything except Firefox
+      (e.code === 22 || // Firefox
+        e.code === 1014 || // test name field too, because code might not be present
+        // everything except Firefox
+        e.name === "QuotaExceededError" || // Firefox
+        e.name === "NS_ERROR_DOM_QUOTA_REACHED") && // acknowledge QuotaExceededError only if there's something already stored
+      storage &&
+      storage.length !== 0
+    );
+  }
+}
+
+function NewItem(itemId, name, time, date, text) {
+  this.itemId = itemId;
+  this.name = name;
+  this.time = time;
+  this.date = date;
+  this.text = text;
+}
+
+function localItem(itemObject, idlocal) {
+  localStorage.setItem("name-".concat(idlocal), itemObject.name);
+  localStorage.setItem("time-".concat(idlocal), itemObject.name);
+  localStorage.setItem("date-".concat(idlocal), itemObject.date);
+  localStorage.setItem("text-".concat(idlocal), itemObject.text);
+  return localStorage;
+} // if (storageAvailable('localStorage')) {
+//   // Yippee! We can use localStorage awesomeness
+// }
+// else {
+//   // Too bad, no localStorage for us
+// }
+
 var checkPage = function checkPage(value) {
   var currentPage = value.children["0"].id;
   var btnLogic;
@@ -249,6 +297,28 @@ var willPage = function willPage() {
   return MyPage.page;
 };
 
+var TodoPage = function TodoPage(idNum) {
+  var h2Name = methods.h2Create(
+    localStorage.getItem("name-".concat(idNum)),
+    "h2Name"
+  );
+  var h2Time = methods.h2Create(
+    localStorage.getItem("time-".concat(idNum)),
+    "h2time"
+  );
+  var h2Date = methods.h2Create(
+    localStorage.getItem("date-".concat(idNum)),
+    "h2date"
+  );
+  var h2Text = methods.h2Create(
+    localStorage.getItem("text-".concat(idNum)),
+    "h2text"
+  );
+  var someDiv = methods.divCreate("", "someDiv");
+  someDiv.append(h2Name, h2Time, h2Date, h2Text);
+  return someDiv;
+};
+
 var donePage = function donePage() {
   var MyPage = new WritingPages("done");
   return MyPage.page;
@@ -284,6 +354,16 @@ var chooseContent = function chooseContent() {
   );
   choose.append(doingWrap, willWrap, doneWrap, back);
   return choose;
+};
+
+var idGet = function idGet() {
+  var idCalled = localStorage.getItem("Id");
+  return idCalled;
+};
+
+var idSet = function idSet(value) {
+  var idChanged = localStorage.setItem("Id", "".concat(value));
+  return idChanged;
 }; //
 
 var returnBtn = function returnBtn(value) {
@@ -321,7 +401,31 @@ var pageLoader = function pageLoader(btn, page, value) {
     Loadedpage.addEventListener("click", function () {
       src.innerHTML = "";
       src.append(page);
-      returnBtn(main);
+      var submit = checkPage(src).submitBtns;
+      submit.addEventListener("click", function () {
+        var nowId = idGet();
+        console.log(nowId);
+        var input =
+          value.children["0"].children["1"].children["0"].children["1"];
+        var time =
+          value.children["0"].children["1"].children["1"].children["1"];
+        var date =
+          value.children["0"].children["1"].children["2"].children["1"];
+        var textA =
+          value.children["0"].children["1"].children["3"].children["0"];
+        var FirstItem = new NewItem(
+          nowId,
+          input.value,
+          time.value,
+          date.value,
+          textA.value
+        );
+        localItem(FirstItem, nowId);
+        var changeId = parseInt(nowId, 10);
+        idSet((changeId += 1));
+      });
+      var side = TodoPage();
+      returnBtn(side);
     });
   }
 };

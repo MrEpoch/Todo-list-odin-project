@@ -3,6 +3,60 @@ import "./style.css";
 import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
+if (!localStorage.getItem("Id")) {
+  localStorage.setItem("Id", "0");
+}
+
+function storageAvailable(type) {
+  let storage;
+  try {
+    storage = window[type];
+    const x = "__storage_test__";
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return (
+      e instanceof DOMException &&
+      // everything except Firefox
+      (e.code === 22 ||
+        // Firefox
+        e.code === 1014 ||
+        // test name field too, because code might not be present
+        // everything except Firefox
+        e.name === "QuotaExceededError" ||
+        // Firefox
+        e.name === "NS_ERROR_DOM_QUOTA_REACHED") &&
+      // acknowledge QuotaExceededError only if there's something already stored
+      storage &&
+      storage.length !== 0
+    );
+  }
+}
+
+function NewItem(itemId, name, time, date, text) {
+  this.itemId = itemId;
+  this.name = name;
+  this.time = time;
+  this.date = date;
+  this.text = text;
+}
+
+function localItem(itemObject, idlocal) {
+  localStorage.setItem(`name-${idlocal}`, itemObject.name);
+  localStorage.setItem(`time-${idlocal}`, itemObject.name);
+  localStorage.setItem(`date-${idlocal}`, itemObject.date);
+  localStorage.setItem(`text-${idlocal}`, itemObject.text);
+
+  return localStorage;
+}
+
+// if (storageAvailable('localStorage')) {
+//   // Yippee! We can use localStorage awesomeness
+// }
+// else {
+//   // Too bad, no localStorage for us
+// }
 
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
@@ -183,6 +237,30 @@ const willPage = () => {
   return MyPage.page;
 };
 
+const TodoPage = (idNum) => {
+  const h2Name = methods.h2Create(
+    localStorage.getItem(`name-${idNum}`),
+    "h2Name"
+  );
+  const h2Time = methods.h2Create(
+    localStorage.getItem(`time-${idNum}`),
+    "h2time"
+  );
+  const h2Date = methods.h2Create(
+    localStorage.getItem(`date-${idNum}`),
+    "h2date"
+  );
+  const h2Text = methods.h2Create(
+    localStorage.getItem(`text-${idNum}`),
+    "h2text"
+  );
+
+  const someDiv = methods.divCreate("", "someDiv");
+  someDiv.append(h2Name, h2Time, h2Date, h2Text);
+
+  return someDiv;
+};
+
 const donePage = () => {
   const MyPage = new WritingPages("done");
   return MyPage.page;
@@ -225,6 +303,16 @@ const chooseContent = () => {
   return choose;
 };
 
+const idGet = () => {
+  const idCalled = localStorage.getItem("Id");
+  return idCalled;
+};
+
+const idSet = (value) => {
+  const idChanged = localStorage.setItem("Id", `${value}`);
+  return idChanged;
+};
+
 //
 
 const returnBtn = (value) => {
@@ -262,7 +350,31 @@ const pageLoader = (btn, page, value) => {
     Loadedpage.addEventListener("click", () => {
       src.innerHTML = "";
       src.append(page);
-      returnBtn(main);
+      const submit = checkPage(src).submitBtns;
+      submit.addEventListener("click", () => {
+        let nowId = idGet();
+        console.log(nowId);
+        const input =
+          value.children["0"].children["1"].children["0"].children["1"];
+        const time =
+          value.children["0"].children["1"].children["1"].children["1"];
+        const date =
+          value.children["0"].children["1"].children["2"].children["1"];
+        const textA =
+          value.children["0"].children["1"].children["3"].children["0"];
+        const FirstItem = new NewItem(
+          nowId,
+          input.value,
+          time.value,
+          date.value,
+          textA.value
+        );
+        localItem(FirstItem, nowId);
+        let changeId = parseInt(nowId, 10);
+        idSet((changeId += 1));
+      });
+      const side = TodoPage();
+      returnBtn(side);
     });
   }
 };
