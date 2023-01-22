@@ -5,6 +5,7 @@
 }
 
 :root {
+  --btn-size: 70px;
 }
 
 @font-face {
@@ -35,6 +36,29 @@ body {
   background-position: center;
   display: grid;
   grid-template: 0.5fr 3fr / 1fr;
+}
+
+.see-item {
+  position: absolute;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  right: 10px;
+  right: 35px;
+  top: 250px;
+  background-color: white;
+  border-radius: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.see-item > svg {
+  width: 40px;
+  height: 40px;
+}
+
+.see-item:hover {
+  background-color: rgb(144, 141, 141);
 }
 
 #doing,
@@ -110,9 +134,9 @@ textarea {
 }
 
 #return-text {
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50px;
   background-color: rgba(255, 255, 255, 0.548);
   display: flex;
   justify-content: center;
@@ -284,8 +308,8 @@ textarea {
   top: 140px;
   background-color: #fafafa;
   border: 2px solid rgba(215, 205, 205, 0.795);
-  width: 60px;
-  height: 60px;
+  width: var(--btn-size);
+  height: var(--btn-size);
   border-radius: 50px;
   display: flex;
   justify-content: center;
