@@ -367,9 +367,11 @@ const choosePage = () => {
 };
 
 const seePage = (id, value) => {
+  console.log(id);
   const chosen = new SeePage(id, value);
-
-  return chosen.page;
+  const myPage = chosen.page;
+  const myField = chosen.field;
+  return { myPage, myField };
 };
 
 //
@@ -402,29 +404,34 @@ if (navbar() && content()) {
 const chooseS = choosePage();
 
 const seeBtnsLogic = (value, id) => {
+  const field = value.children["0"].children["1"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
   let currId = id;
   next.addEventListener("click", () => {
-    if (currId < itemsCount()) {
+    if (currId < idGet()) {
       currId += 1;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      const stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     } else if (currId === itemsCount()) {
       currId = 0;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      const stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     }
   });
   prev.addEventListener("click", () => {
     if (currId > 0) {
       currId -= 1;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      const stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     } else if (currId === 0) {
       currId = 0;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      const stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     }
   });
 };
@@ -485,9 +492,9 @@ seeBtn.addEventListener("click", () => {
   src.append(chooseS);
   checkIfId();
 
-  writeLoader("doing", seePage("0", "see"), src, chooseS);
-  writeLoader("will", seePage("0", "see"), src, chooseS);
-  writeLoader("done", seePage("0", "see"), src, chooseS);
+  writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("will", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("done", seePage("0", "see").myPage, src, chooseS);
 
   returnBtn(main);
 });
