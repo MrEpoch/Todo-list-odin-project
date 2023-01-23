@@ -418,8 +418,14 @@ var choosePage = function choosePage() {
 };
 
 var seePage = function seePage(id, value) {
+  console.log(id);
   var chosen = new SeePage(id, value);
-  return chosen.page;
+  var myPage = chosen.page;
+  var myField = chosen.field;
+  return {
+    myPage: myPage,
+    myField: myField,
+  };
 }; //
 
 var returnBtn = function returnBtn(value) {
@@ -451,29 +457,38 @@ if (navbar() && content()) {
 var chooseS = choosePage();
 
 var seeBtnsLogic = function seeBtnsLogic(value, id) {
+  var field = value.children["0"].children["1"];
   var next = checkPage(value).nextBtn;
   var prev = checkPage(value).prevBtn;
   var currId = id;
   next.addEventListener("click", function () {
-    if (currId < itemsCount()) {
+    if (currId < idGet()) {
       currId += 1;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      var stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     } else if (currId === itemsCount()) {
       currId = 0;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+
+      var _stringNum = currId.toString();
+
+      field.append(seePage(_stringNum, "see").myField);
     }
   });
   prev.addEventListener("click", function () {
     if (currId > 0) {
       currId -= 1;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+      var stringNum = currId.toString();
+      field.append(seePage(stringNum, "see").myField);
     } else if (currId === 0) {
       currId = 0;
-      src.innerHTML = "";
-      src.append(seePage(toString(currId), "see"));
+      field.innerHTML = "";
+
+      var _stringNum2 = currId.toString();
+
+      field.append(seePage(_stringNum2, "see").myField);
     }
   });
 };
@@ -528,9 +543,9 @@ seeBtn.addEventListener("click", function () {
   src.innerHTML = "";
   src.append(chooseS);
   checkIfId();
-  writeLoader("doing", seePage("0", "see"), src, chooseS);
-  writeLoader("will", seePage("0", "see"), src, chooseS);
-  writeLoader("done", seePage("0", "see"), src, chooseS);
+  writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("will", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("done", seePage("0", "see").myPage, src, chooseS);
   returnBtn(main);
 });
 document.body.appendChild(src);
