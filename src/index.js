@@ -73,6 +73,12 @@ const idSet = (value) => {
   return idChanged;
 };
 
+const itemsCount = () => {
+  const currentId = localStorage.getItem("Id");
+  const IntId = parseInt(currentId, 10) + 1;
+  return IntId;
+};
+
 function LoadH(hType, hValue) {
   const loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
 
@@ -91,6 +97,8 @@ const checkPage = (value) => {
   let btnLogic;
   let submitBtns;
   let writeBtns;
+  let nextBtn;
+  let prevBtn;
   const pageBtns = {};
   if (currentPage === "main") {
     btnLogic = value.children["0"].children["1"].children["3"];
@@ -108,8 +116,13 @@ const checkPage = (value) => {
   ) {
     btnLogic = value.children["0"].children["0"];
     submitBtns = value.children["0"].children["2"].children["0"];
+  } else if (currentPage === "see") {
+    btnLogic = value.children["0"].children["0"];
+    nextBtn = value.children["0"].children["2"].children["0"];
+    prevBtn = value.children["0"].children["3"].children["0"];
   }
-  return { btnLogic, pageBtns, submitBtns, writeBtns };
+
+  return { btnLogic, pageBtns, submitBtns, writeBtns, nextBtn, prevBtn };
 };
 
 //
@@ -277,6 +290,7 @@ function SeePage(id, value) {
   this.textItem = findItem(id, "text");
 
   this.page = methods.divCreate("", `page-${value}`);
+  this.page.id = "see";
 
   this.field = methods.fieldsetCreate("", `field-Re`);
   this.returnBtn = methods.divCreate(
@@ -385,6 +399,35 @@ if (navbar() && content()) {
     "***  navbar() or content() didn't return expected value!  ***"
   );
 }
+const chooseS = choosePage();
+
+const seeBtnsLogic = (value, id) => {
+  const next = checkPage(value).nextBtn;
+  const prev = checkPage(value).prevBtn;
+  let currId = id;
+  next.addEventListener("click", () => {
+    if (currId < itemsCount()) {
+      currId += 1;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    } else if (currId === itemsCount()) {
+      currId = 0;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    }
+  });
+  prev.addEventListener("click", () => {
+    if (currId > 0) {
+      currId -= 1;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    } else if (currId === 0) {
+      currId = 0;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    }
+  });
+};
 
 const writeSubmit = (value) => {
   const submit = checkPage(src).submitBtns;
@@ -416,8 +459,8 @@ const writeLoader = (btn, page, value, returnPage) => {
     Loadedpage.addEventListener("click", () => {
       src.innerHTML = "";
       src.append(page);
-      writeSubmit(writePage());
       returnBtn(returnPage);
+      seeBtnsLogic(value, 0);
     });
   }
 };
@@ -439,12 +482,12 @@ addBtn.addEventListener("click", () => {
 
 seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
-  src.append(choosePage());
+  src.append(chooseS);
   checkIfId();
 
-  writeLoader("doing", seePage("0", "see"), src, choosePage());
-  writeLoader("will", seePage(), src, choosePage());
-  writeLoader("done", seePage(), src, choosePage());
+  writeLoader("doing", seePage("0", "see"), src, chooseS);
+  writeLoader("will", seePage("0", "see"), src, chooseS);
+  writeLoader("done", seePage("0", "see"), src, chooseS);
 
   returnBtn(main);
 });

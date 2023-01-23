@@ -136,6 +136,12 @@ var idSet = function idSet(value) {
   return idChanged;
 };
 
+var itemsCount = function itemsCount() {
+  var currentId = localStorage.getItem("Id");
+  var IntId = parseInt(currentId, 10) + 1;
+  return IntId;
+};
+
 function LoadH(hType, hValue) {
   var loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
   return loaderH3;
@@ -151,6 +157,8 @@ var checkPage = function checkPage(value) {
   var btnLogic;
   var submitBtns;
   var writeBtns;
+  var nextBtn;
+  var prevBtn;
   var pageBtns = {};
 
   if (currentPage === "main") {
@@ -169,6 +177,10 @@ var checkPage = function checkPage(value) {
   ) {
     btnLogic = value.children["0"].children["0"];
     submitBtns = value.children["0"].children["2"].children["0"];
+  } else if (currentPage === "see") {
+    btnLogic = value.children["0"].children["0"];
+    nextBtn = value.children["0"].children["2"].children["0"];
+    prevBtn = value.children["0"].children["3"].children["0"];
   }
 
   return {
@@ -176,6 +188,8 @@ var checkPage = function checkPage(value) {
     pageBtns: pageBtns,
     submitBtns: submitBtns,
     writeBtns: writeBtns,
+    nextBtn: nextBtn,
+    prevBtn: prevBtn,
   };
 }; //
 
@@ -339,6 +353,7 @@ function SeePage(id, value) {
   this.dateItem = findItem(id, "date");
   this.textItem = findItem(id, "text");
   this.page = methods.divCreate("", "page-".concat(value));
+  this.page.id = "see";
   this.field = methods.fieldsetCreate("", "field-Re");
   this.returnBtn = methods.divCreate(
     "",
@@ -433,6 +448,36 @@ if (navbar() && content()) {
   );
 }
 
+var chooseS = choosePage();
+
+var seeBtnsLogic = function seeBtnsLogic(value, id) {
+  var next = checkPage(value).nextBtn;
+  var prev = checkPage(value).prevBtn;
+  var currId = id;
+  next.addEventListener("click", function () {
+    if (currId < itemsCount()) {
+      currId += 1;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    } else if (currId === itemsCount()) {
+      currId = 0;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    }
+  });
+  prev.addEventListener("click", function () {
+    if (currId > 0) {
+      currId -= 1;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    } else if (currId === 0) {
+      currId = 0;
+      src.innerHTML = "";
+      src.append(seePage(toString(currId), "see"));
+    }
+  });
+};
+
 var writeSubmit = function writeSubmit(value) {
   var submit = checkPage(src).submitBtns;
   submit.addEventListener("click", function () {
@@ -462,8 +507,8 @@ var writeLoader = function writeLoader(btn, page, value, returnPage) {
     Loadedpage.addEventListener("click", function () {
       src.innerHTML = "";
       src.append(page);
-      writeSubmit(writePage());
       returnBtn(returnPage);
+      seeBtnsLogic(value, 0);
     });
   }
 };
@@ -481,11 +526,11 @@ addBtn.addEventListener("click", function () {
 });
 seeBtn.addEventListener("click", function () {
   src.innerHTML = "";
-  src.append(choosePage());
+  src.append(chooseS);
   checkIfId();
-  writeLoader("doing", seePage("0", "see"), src, choosePage());
-  writeLoader("will", seePage(), src, choosePage());
-  writeLoader("done", seePage(), src, choosePage());
+  writeLoader("doing", seePage("0", "see"), src, chooseS);
+  writeLoader("will", seePage("0", "see"), src, chooseS);
+  writeLoader("done", seePage("0", "see"), src, chooseS);
   returnBtn(main);
 });
 document.body.appendChild(src);
