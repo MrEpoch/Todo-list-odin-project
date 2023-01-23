@@ -63,14 +63,13 @@ body {
 
 #doing,
 #will,
+#write,
 #done {
   display: grid;
   grid-template-rows: 1fr 3.5fr 1fr;
 }
 
-#doing > fieldset,
-#will > fieldset,
-#done > fieldset {
+#write > fieldset {
   grid-row: 2 / 3;
   width: 40%;
   height: 100%;
@@ -167,7 +166,7 @@ textarea {
   background-color: grey;
 }
 
-.page-will-container {
+.page-write-container {
   background-image: url("./components/images/will.jpg");
   background-position: center;
   background-size: cover;
@@ -239,7 +238,7 @@ textarea {
   width: 100%;
 }
 
-.will-wrap {
+.write-wrap {
   background-image: url("./components/images/will.jpg");
   background-position: center;
   background-size: cover;

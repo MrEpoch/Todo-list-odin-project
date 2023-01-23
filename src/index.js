@@ -51,6 +51,30 @@ function localItem(itemObject, idlocal) {
   return localStorage;
 }
 
+function findItem(id, item) {
+  if (localStorage.getItem(`${item}-${id}`) === null) {
+    return "empty";
+  }
+
+  return localStorage.getItem(`${item}-${id}`);
+}
+
+const idGet = () => {
+  const idCalled = localStorage.getItem("Id");
+  return idCalled;
+};
+
+const idSet = (value) => {
+  const idChanged = localStorage.setItem("Id", `${value}`);
+  return idChanged;
+};
+
+function LoadH(hType, hValue) {
+  const loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
+
+  return loaderH3;
+}
+
 // if (storageAvailable('localStorage')) {
 //   // Yippee! We can use localStorage awesomeness
 // }
@@ -62,11 +86,11 @@ const checkPage = (value) => {
   const currentPage = value.children["0"].id;
   let btnLogic;
   let submitBtns;
-  let writeBtns
+  let writeBtns;
   const pageBtns = {};
   if (currentPage === "main") {
     btnLogic = value.children["0"].children["1"].children["3"];
-    writeBtns = value.children["0"].children["1"].children["4"]
+    writeBtns = value.children["0"].children["1"].children["4"];
   } else if (currentPage === "choose") {
     btnLogic = value.children["0"].children["3"];
     pageBtns.doingBtns = value.children["0"].children["0"].children["0"];
@@ -75,7 +99,8 @@ const checkPage = (value) => {
   } else if (
     currentPage === "doing" ||
     currentPage === "will" ||
-    currentPage === "done"
+    currentPage === "done" ||
+    currentPage === "write"
   ) {
     btnLogic = value.children["0"].children["0"];
     submitBtns = value.children["0"].children["2"].children["0"];
@@ -101,9 +126,9 @@ const SvgPict = () => {
   const returnIcon = `<svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"> </path>
                       </svg>`;
-  const writeIcon = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 256 256" style="enable-background:new 0 0 256 256" xml:space="preserve"><style>.st2{fill:#69ebfc}.st5{fill:#d476e2}.st14{fill:#edd4c2}</style><path d="M205 0H20c5.52 0 10.52 2.24 14.14 5.86S40 14.48 40 20v236h185V20c0-11.046-8.954-20-20-20z" style="fill:#ffefe4"/><path class="st14" d="M40 250h185v6H40z"/><path d="M205 0H20c5.52 0 10.52 2.24 14.14 5.86.045.045.083.095.127.14H205c11.046 0 20 8.954 20 20v-6c0-11.046-8.954-20-20-20z" style="fill:#fff7f2"/><path d="M144 56H70a8 8 0 0 1 0-16h74a8 8 0 0 1 0 16z" style="fill:#ff8354"/><path class="st14" d="M188 84H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 111.2H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 138.4H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 165.6H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 192.8H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM147 220H66a4 4 0 0 1 0-8h81a4 4 0 0 1 0 8zM40 20v60H0V20C0 8.95 8.95 0 20 0c5.52 0 10.52 2.24 14.14 5.86S40 14.48 40 20z"/><path transform="rotate(30 173.417 175.565)" class="st5" d="M163.411 150.575h20v50h-20z"/><path class="st5" d="m169.571 202.226-17.32-10-5.625 24.567a2.708 2.708 0 0 0 4.483 2.589l18.462-17.156z"/><path transform="rotate(30 212.163 108.447)" class="st2" d="M202.161 55.958h20v105h-20z"/><path transform="rotate(-150 244.807 75.92)" class="st2" d="M242.803 72.92h4v6h-4z"/><path class="st2" d="M223.999 123.954a4 4 0 0 0 5.464-1.464l26-45.033a4 4 0 1 0-6.928-4l-26 45.033a4 4 0 0 0 1.464 5.464z"/><path class="st5" d="M250.911 41.341c-4.783-2.761-10.899-1.123-13.66 3.66l-7.5 12.99 17.32 10 7.5-12.99c2.762-4.782 1.123-10.898-3.66-13.66z"> </path></svg>` 
+  const writeIcon = `<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" viewBox="0 0 256 256" style="enable-background:new 0 0 256 256" xml:space="preserve"><style>.st2{fill:#69ebfc}.st5{fill:#d476e2}.st14{fill:#edd4c2}</style><path d="M205 0H20c5.52 0 10.52 2.24 14.14 5.86S40 14.48 40 20v236h185V20c0-11.046-8.954-20-20-20z" style="fill:#ffefe4"/><path class="st14" d="M40 250h185v6H40z"/><path d="M205 0H20c5.52 0 10.52 2.24 14.14 5.86.045.045.083.095.127.14H205c11.046 0 20 8.954 20 20v-6c0-11.046-8.954-20-20-20z" style="fill:#fff7f2"/><path d="M144 56H70a8 8 0 0 1 0-16h74a8 8 0 0 1 0 16z" style="fill:#ff8354"/><path class="st14" d="M188 84H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 111.2H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 138.4H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 165.6H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM188 192.8H66a4 4 0 0 1 0-8h122a4 4 0 0 1 0 8zM147 220H66a4 4 0 0 1 0-8h81a4 4 0 0 1 0 8zM40 20v60H0V20C0 8.95 8.95 0 20 0c5.52 0 10.52 2.24 14.14 5.86S40 14.48 40 20z"/><path transform="rotate(30 173.417 175.565)" class="st5" d="M163.411 150.575h20v50h-20z"/><path class="st5" d="m169.571 202.226-17.32-10-5.625 24.567a2.708 2.708 0 0 0 4.483 2.589l18.462-17.156z"/><path transform="rotate(30 212.163 108.447)" class="st2" d="M202.161 55.958h20v105h-20z"/><path transform="rotate(-150 244.807 75.92)" class="st2" d="M242.803 72.92h4v6h-4z"/><path class="st2" d="M223.999 123.954a4 4 0 0 0 5.464-1.464l26-45.033a4 4 0 1 0-6.928-4l-26 45.033a4 4 0 0 0 1.464 5.464z"/><path class="st5" d="M250.911 41.341c-4.783-2.761-10.899-1.123-13.66 3.66l-7.5 12.99 17.32 10 7.5-12.99c2.762-4.782 1.123-10.898-3.66-13.66z"> </path></svg>`;
 
-  const noteIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>note-multiple-outline</title><path d="M3,6V22H21V24H3A2,2 0 0,1 1,22V6H3M16,9H21.5L16,3.5V9M7,2H17L23,8V18A2,2 0 0,1 21,20H7C5.89,20 5,19.1 5,18V4A2,2 0 0,1 7,2M7,4V18H21V11H14V4H7Z"> </path></svg>`
+  const noteIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>note-multiple-outline</title><path d="M3,6V22H21V24H3A2,2 0 0,1 1,22V6H3M16,9H21.5L16,3.5V9M7,2H17L23,8V18A2,2 0 0,1 21,20H7C5.89,20 5,19.1 5,18V4A2,2 0 0,1 7,2M7,4V18H21V11H14V4H7Z"> </path></svg>`;
   return { plusIcon, returnIcon, writeIcon, noteIcon };
 };
 
@@ -125,7 +150,7 @@ const content = () => {
   const done = Card(cardsInner.doneH4);
 
   const add = methods.divCreate("", "add-item", "", SvgPict().plusIcon);
-  const see = methods.divCreate("", "see-item", "", SvgPict().noteIcon)
+  const see = methods.divCreate("", "see-item", "", SvgPict().noteIcon);
 
   myContent.append(doing, will, done, add, see);
   const addHtml = myContent.children["3"];
@@ -210,21 +235,13 @@ const TodoSubmit = (pageName) => {
   return wrappedBtn;
 };
 
-const TodoShowName = () => {
+const TodoShowName = () => {};
 
-}
+const TodoShowTime = () => {};
 
-const TodoShowTime = () => {
+const TodoShowDate = () => {};
 
-}
-
-const TodoShowDate = () => {
-  
-}
-
-const TodoShowText = () => {
-  
-}
+const TodoShowText = () => {};
 
 function WritingPages(pageName) {
   this.page = methods.divCreate(
@@ -249,55 +266,50 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-function SeePages(pageName) {
-  this.page = methods.divCreate(
-    "",
-    `page-${pageName}-container`,
-    `${pageName}`
-  );
-  this.field = methods.fieldsetCreate("", `field-${pageName}`);
+function ChosenPage(id, value) {
+  this.nameItem = findItem(id, "name");
+  this.timeItem = findItem(id, "time");
+  this.dateItem = findItem(id, "date");
+  this.textItem = findItem(id, "text");
+
+  this.page = methods.divCreate("", `page-${value}`);
+
+  this.field = methods.fieldsetCreate("", `field-Re`);
   this.returnBtn = methods.divCreate(
     "",
-    `return-${pageName}`,
+    `return-Re`,
     "return-text",
     SvgPict().returnIcon
   );
-  this.next = methods.divCreate("", "btn-next-container");
-  this.prev = methods.divCreate("", "btn-prev-container");
 
-  this.page.append(this.returnBtn, this.field);
+  this.next = methods.methodCreate("button", "next", "btn-next");
+  this.prev = methods.methodCreate("button", "previus", "btn-prev");
+
+  this.name = methods.divCreate(LoadH("h3", this.nameItem), "item-name");
+  this.time = methods.divCreate(LoadH("h3", this.timeItem), "item-time");
+  this.date = methods.divCreate(LoadH("h3", this.dateItem), "item-date");
+  this.text = methods.divCreate(LoadH("h3", this.textItem), "item-text");
+
+  this.field.append(this.name, this.time, this.date, this.text);
+
+  this.nextContainer = methods.divCreate("", "btn-next-container");
+  this.prevContainer = methods.divCreate("", "btn-prev-container");
+
+  this.nextContainer.append(this.next);
+  this.prevContainer.append(this.prev);
+
+  this.page.append(
+    this.returnBtn,
+    this.field,
+    this.nextContainer,
+    this.prevContainer
+  );
 }
 
 const writePage = () => {
-  const MyPage = new WritingPages("will");
+  const MyPage = new WritingPages("write");
   return MyPage.page;
 };
-
-
-const TodoPage = (idNum) => {
-  const h2Name = methods.h2Create(
-    localStorage.getItem(`name-${idNum}`),
-    "h2Name"
-  );
-  const h2Time = methods.h2Create(
-    localStorage.getItem(`time-${idNum}`),
-    "h2time"
-  );
-  const h2Date = methods.h2Create(
-    localStorage.getItem(`date-${idNum}`),
-    "h2date"
-  );
-  const h2Text = methods.h2Create(
-    localStorage.getItem(`text-${idNum}`),
-    "h2text"
-  );
-
-  const someDiv = methods.divCreate("", "someDiv");
-  someDiv.append(h2Name, h2Time, h2Date, h2Text);
-
-  return someDiv;
-};
-
 
 const seePage = () => {
   const choose = methods.divCreate("", "choose-container", "choose");
@@ -336,20 +348,10 @@ const seePage = () => {
   return choose;
 };
 
-const chosenPage = (value) => {
-  const chosen = new SeePages("doing");
+const chosenPage = (id, value) => {
+  const chosen = new ChosenPage(id, value);
 
   return chosen;
-}
-
-const idGet = () => {
-  const idCalled = localStorage.getItem("Id");
-  return idCalled;
-};
-
-const idSet = (value) => {
-  const idChanged = localStorage.setItem("Id", `${value}`);
-  return idChanged;
 };
 
 //
@@ -379,7 +381,30 @@ if (navbar() && content()) {
   );
 }
 
-const pageLoader = (btn, page, value) => {
+const writeSubmit = (value) => {
+  const submit = checkPage(src).submitBtns;
+  submit.addEventListener("click", () => {
+    const nowId = idGet();
+    const input = value.children["1"].children["0"].children["1"];
+    const time = value.children["1"].children["1"].children["1"];
+    const date = value.children["1"].children["2"].children["1"];
+    const textA = value.children["1"].children["3"].children["0"];
+    const FirstItem = new NewItem(
+      nowId,
+      input.value,
+      time.value,
+      date.value,
+      textA.value
+    );
+    localItem(FirstItem, nowId);
+    let changeId = parseInt(nowId, 10);
+    idSet((changeId += 1));
+  });
+
+  return submit;
+};
+
+const writeLoader = (btn, page, value) => {
   if (
     value.children["0"].id !== "main" ||
     value.children["0"].id !== "choose"
@@ -389,30 +414,9 @@ const pageLoader = (btn, page, value) => {
     Loadedpage.addEventListener("click", () => {
       src.innerHTML = "";
       src.append(page);
-      const submit = checkPage(src).submitBtns;
-      submit.addEventListener("click", () => {
-        const nowId = idGet();
-        const input =
-          value.children["0"].children["1"].children["0"].children["1"];
-        const time =
-          value.children["0"].children["1"].children["1"].children["1"];
-        const date =
-          value.children["0"].children["1"].children["2"].children["1"];
-        const textA =
-          value.children["0"].children["1"].children["3"].children["0"];
-        const FirstItem = new NewItem(
-          nowId,
-          input.value,
-          time.value,
-          date.value,
-          textA.value
-        );
-        localItem(FirstItem, nowId);
-        let changeId = parseInt(nowId, 10);
-        idSet((changeId += 1));
-      });
-      const side = TodoPage();
-      returnBtn(side);
+      writeSubmit(writePage());
+
+      returnBtn(main);
     });
   }
 };
@@ -420,24 +424,24 @@ const pageLoader = (btn, page, value) => {
 src.append(main);
 
 const addBtn = checkPage(src).btnLogic;
-const writeBtn = checkPage(src).writeBtns;
+const seeBtn = checkPage(src).writeBtns;
 
 addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
 
+  const tryToRep = writePage();
+  console.log(tryToRep);
+  writeSubmit(tryToRep);
   returnBtn(main);
 });
 
-writeBtn.addEventListener("click", () => {
+seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(seePage());
+
   returnBtn(main);
-  pageLoader("doing", chosenPage(), src);
-  pageLoader("will");
-  pageLoader("done");
-  
 });
 
 document.body.appendChild(src);
