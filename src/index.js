@@ -3,9 +3,13 @@ import "./style.css";
 import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
-if (!localStorage.getItem("Id")) {
-  localStorage.setItem("Id", "0");
-}
+const checkIfId = () => {
+  if (!localStorage.getItem("Id")) {
+    localStorage.setItem("Id", "0");
+  }
+};
+
+checkIfId();
 
 function storageAvailable(type) {
   let storage;
@@ -44,7 +48,7 @@ function NewItem(itemId, name, time, date, text) {
 
 function localItem(itemObject, idlocal) {
   localStorage.setItem(`name-${idlocal}`, itemObject.name);
-  localStorage.setItem(`time-${idlocal}`, itemObject.name);
+  localStorage.setItem(`time-${idlocal}`, itemObject.time);
   localStorage.setItem(`date-${idlocal}`, itemObject.date);
   localStorage.setItem(`text-${idlocal}`, itemObject.text);
 
@@ -266,7 +270,7 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-function ChosenPage(id, value) {
+function SeePage(id, value) {
   this.nameItem = findItem(id, "name");
   this.timeItem = findItem(id, "time");
   this.dateItem = findItem(id, "date");
@@ -311,7 +315,7 @@ const writePage = () => {
   return MyPage.page;
 };
 
-const seePage = () => {
+const choosePage = () => {
   const choose = methods.divCreate("", "choose-container", "choose");
 
   const chooseText = {
@@ -348,10 +352,10 @@ const seePage = () => {
   return choose;
 };
 
-const chosenPage = (id, value) => {
-  const chosen = new ChosenPage(id, value);
+const seePage = (id, value) => {
+  const chosen = new SeePage(id, value);
 
-  return chosen;
+  return chosen.page;
 };
 
 //
@@ -361,6 +365,7 @@ const returnBtn = (value) => {
   returnBtns.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(value);
+    checkIfId();
   });
 
   return returnBtns;
@@ -385,10 +390,10 @@ const writeSubmit = (value) => {
   const submit = checkPage(src).submitBtns;
   submit.addEventListener("click", () => {
     const nowId = idGet();
-    const input = value.children["1"].children["0"].children["1"];
-    const time = value.children["1"].children["1"].children["1"];
-    const date = value.children["1"].children["2"].children["1"];
-    const textA = value.children["1"].children["3"].children["0"];
+    const input = value.children[0].children["1"].children["0"].children["1"];
+    const time = value.children[0].children["1"].children["1"].children["1"];
+    const date = value.children[0].children["1"].children["2"].children["1"];
+    const textA = value.children[0].children["1"].children["3"].children["0"];
     const FirstItem = new NewItem(
       nowId,
       input.value,
@@ -404,19 +409,15 @@ const writeSubmit = (value) => {
   return submit;
 };
 
-const writeLoader = (btn, page, value) => {
-  if (
-    value.children["0"].id !== "main" ||
-    value.children["0"].id !== "choose"
-  ) {
+const writeLoader = (btn, page, value, returnPage) => {
+  if (value.children["0"].id === "choose") {
     let parameter = btn;
     const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
     Loadedpage.addEventListener("click", () => {
       src.innerHTML = "";
       src.append(page);
       writeSubmit(writePage());
-
-      returnBtn(main);
+      returnBtn(returnPage);
     });
   }
 };
@@ -430,16 +431,20 @@ addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
+  checkIfId();
 
-  const tryToRep = writePage();
-  console.log(tryToRep);
-  writeSubmit(tryToRep);
+  writeSubmit(src);
   returnBtn(main);
 });
 
 seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
-  src.append(seePage());
+  src.append(choosePage());
+  checkIfId();
+
+  writeLoader("doing", seePage("0", "see"), src, choosePage());
+  writeLoader("will", seePage(), src, choosePage());
+  writeLoader("done", seePage(), src, choosePage());
 
   returnBtn(main);
 });

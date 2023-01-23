@@ -71,9 +71,13 @@ function _interopRequireWildcard(obj) {
 
 var src = methods.divCreate("", "src");
 
-if (!localStorage.getItem("Id")) {
-  localStorage.setItem("Id", "0");
-}
+var checkIfId = function checkIfId() {
+  if (!localStorage.getItem("Id")) {
+    localStorage.setItem("Id", "0");
+  }
+};
+
+checkIfId();
 
 function storageAvailable(type) {
   var storage;
@@ -108,7 +112,7 @@ function NewItem(itemId, name, time, date, text) {
 
 function localItem(itemObject, idlocal) {
   localStorage.setItem("name-".concat(idlocal), itemObject.name);
-  localStorage.setItem("time-".concat(idlocal), itemObject.name);
+  localStorage.setItem("time-".concat(idlocal), itemObject.time);
   localStorage.setItem("date-".concat(idlocal), itemObject.date);
   localStorage.setItem("text-".concat(idlocal), itemObject.text);
   return localStorage;
@@ -329,7 +333,7 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit("".concat(pageName)));
 }
 
-function ChosenPage(id, value) {
+function SeePage(id, value) {
   this.nameItem = findItem(id, "name");
   this.timeItem = findItem(id, "time");
   this.dateItem = findItem(id, "date");
@@ -366,7 +370,7 @@ var writePage = function writePage() {
   return MyPage.page;
 };
 
-var seePage = function seePage() {
+var choosePage = function choosePage() {
   var choose = methods.divCreate("", "choose-container", "choose");
   var chooseText = {
     doing: "Doing",
@@ -398,9 +402,9 @@ var seePage = function seePage() {
   return choose;
 };
 
-var chosenPage = function chosenPage(id, value) {
-  var chosen = new ChosenPage(id, value);
-  return chosen;
+var seePage = function seePage(id, value) {
+  var chosen = new SeePage(id, value);
+  return chosen.page;
 }; //
 
 var returnBtn = function returnBtn(value) {
@@ -408,6 +412,7 @@ var returnBtn = function returnBtn(value) {
   returnBtns.addEventListener("click", function () {
     src.innerHTML = "";
     src.append(value);
+    checkIfId();
   });
   return returnBtns;
 };
@@ -432,10 +437,10 @@ var writeSubmit = function writeSubmit(value) {
   var submit = checkPage(src).submitBtns;
   submit.addEventListener("click", function () {
     var nowId = idGet();
-    var input = value.children["1"].children["0"].children["1"];
-    var time = value.children["1"].children["1"].children["1"];
-    var date = value.children["1"].children["2"].children["1"];
-    var textA = value.children["1"].children["3"].children["0"];
+    var input = value.children[0].children["1"].children["0"].children["1"];
+    var time = value.children[0].children["1"].children["1"].children["1"];
+    var date = value.children[0].children["1"].children["2"].children["1"];
+    var textA = value.children[0].children["1"].children["3"].children["0"];
     var FirstItem = new NewItem(
       nowId,
       input.value,
@@ -450,18 +455,15 @@ var writeSubmit = function writeSubmit(value) {
   return submit;
 };
 
-var writeLoader = function writeLoader(btn, page, value) {
-  if (
-    value.children["0"].id !== "main" ||
-    value.children["0"].id !== "choose"
-  ) {
+var writeLoader = function writeLoader(btn, page, value, returnPage) {
+  if (value.children["0"].id === "choose") {
     var parameter = btn;
     var Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
     Loadedpage.addEventListener("click", function () {
       src.innerHTML = "";
       src.append(page);
       writeSubmit(writePage());
-      returnBtn(main);
+      returnBtn(returnPage);
     });
   }
 };
@@ -473,14 +475,17 @@ addBtn.addEventListener("click", function () {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
-  var tryToRep = writePage();
-  console.log(tryToRep);
-  writeSubmit(tryToRep);
+  checkIfId();
+  writeSubmit(src);
   returnBtn(main);
 });
 seeBtn.addEventListener("click", function () {
   src.innerHTML = "";
-  src.append(seePage());
+  src.append(choosePage());
+  checkIfId();
+  writeLoader("doing", seePage("0", "see"), src, choosePage());
+  writeLoader("will", seePage(), src, choosePage());
+  writeLoader("done", seePage(), src, choosePage());
   returnBtn(main);
 });
 document.body.appendChild(src);
