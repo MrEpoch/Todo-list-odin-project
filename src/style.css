@@ -62,7 +62,7 @@ body {
 }
 
 #doing,
-#will,
+#late,
 #write,
 #completed {
   display: grid;
@@ -247,7 +247,7 @@ textarea {
   width: 100%;
 }
 
-.write-wrap {
+.Late-wrap {
   background-image: url("./components/images/will.jpg");
   background-position: center;
   background-size: cover;

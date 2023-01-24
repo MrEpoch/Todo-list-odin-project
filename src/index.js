@@ -119,6 +119,29 @@ function LoadH(hType, hValue) {
 //   // Too bad, no localStorage for us
 // }
 
+console.log(arrWithLocal[1].date.split("-")["2"]);
+
+// date === 0-Year, 1-month, 2-day
+
+const order = () => {
+  let dateContainer;
+  for (let i = 0; i < arrWithLocal.length; i += 1) {
+    if (arrWithLocal[i].date) {
+      const curDate = new Date();
+      const curYear = curDate.getFullYear();
+      const curDay = curDate.getDay();
+      const curMonth = curDate.getMonth();
+      dateContainer[i] = arrWithLocal[i].date.split("-");
+      if (dateContainer[i]["0"] < curYear) {
+        if (dateContainer[i]["1"] < curMonth) {
+          if (dateContainer[i]["2"] < curDay) {
+          }
+        }
+      }
+    }
+  }
+};
+
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
   let btnLogic;
@@ -133,11 +156,11 @@ const checkPage = (value) => {
   } else if (currentPage === "choose") {
     btnLogic = value.children["0"].children["3"];
     pageBtns.doingBtns = value.children["0"].children["0"].children["0"];
-    pageBtns.willBtns = value.children["0"].children["1"].children["0"];
+    pageBtns.lateBtns = value.children["0"].children["1"].children["0"];
     pageBtns.completedBtns = value.children["0"].children["2"].children["0"];
   } else if (
     currentPage === "doing" ||
-    currentPage === "will" ||
+    currentPage === "late" ||
     currentPage === "completed" ||
     currentPage === "write"
   ) {
@@ -185,18 +208,18 @@ const content = () => {
 
   const cardsInner = {
     doingH4: methods.h4Create("Doing", "doing-content"),
-    willH4: methods.h4Create("Will do", "will-do-content"),
+    lateH4: methods.h4Create("Late", "Late-content"),
     completedH4: methods.h4Create("completed", "completed-content"),
   };
 
   const doing = Card(cardsInner.doingH4);
-  const will = Card(cardsInner.willH4);
+  const late = Card(cardsInner.lateH4);
   const completed = Card(cardsInner.completedH4);
 
   const add = methods.divCreate("", "add-item", "", SvgPict().plusIcon);
   const see = methods.divCreate("", "see-item", "", SvgPict().noteIcon);
 
-  myContent.append(doing, will, completed, add, see);
+  myContent.append(doing, late, completed, add, see);
   const addHtml = myContent.children["3"];
 
   addHtml.addEventListener("mouseover", () => {
@@ -213,7 +236,7 @@ const content = () => {
 const TodoName = (pageName) => {
   const TodoNameContainer = methods.divCreate("", "projNameContainer");
   const TodoNameLabel = methods.methodCreate(
-    "label",
+    "Label",
     "Todo name",
     `label-${pageName}-name`
   );
@@ -231,7 +254,7 @@ const TodoName = (pageName) => {
 const TodoTime = (pageName) => {
   const TodoTimeContainer = methods.divCreate("", "projTimeContainer");
   const TodoTimeLabel = methods.methodCreate(
-    "label",
+    "Label",
     "Completion Time",
     `label-${pageName}-time`
   );
@@ -244,7 +267,7 @@ const TodoTime = (pageName) => {
 const TodoDate = (pageName) => {
   const TodoDateContainer = methods.divCreate("", "projDateContainer");
   const TodoDateLabel = methods.methodCreate(
-    "label",
+    "Label",
     "Completion date",
     `label-${pageName}-date`
   );
@@ -268,13 +291,13 @@ const TodoText = (pageName) => {
 };
 const TodocompletedOr = (pagename) => {
   const TodocompletedContainer = methods.divCreate("", "projDoneContainer");
-  const TodocompletedLabel = methods.methodCreate("label", "completed")
+  const TodocompletedLabel = methods.methodCreate("Label", "completed");
   const TodocompletedInside = methods.inputCreate("", "done", "checkbox");
 
-  TodocompletedContainer.append(TodocompletedLabel ,TodocompletedInside);
+  TodocompletedContainer.append(TodocompletedLabel, TodocompletedInside);
 
   return TodocompletedContainer;
-}
+};
 const TodoSubmit = (pageName) => {
   const submitBtn = methods.methodCreate(
     "button",
@@ -363,17 +386,17 @@ const choosePage = () => {
 
   const chooseText = {
     doing: "Doing",
-    will: "Will do",
-    completed: "completed",
+    late: "Late",
+    completed: "Completed",
   };
 
   const doingChoose = methods.divCreate(
     methods.h3Create(chooseText.doing, "doing-choose-h3"),
     "doing-choose-div"
   );
-  const willDoChoose = methods.divCreate(
-    methods.h3Create(chooseText.will, "will-choose-h3"),
-    "will-choose-div"
+  const lateChoose = methods.divCreate(
+    methods.h3Create(chooseText.late, "Late-choose-h3"),
+    "Late-choose-div"
   );
   const completedChoose = methods.divCreate(
     methods.h3Create(chooseText.completed, "completed-choose-h3"),
@@ -381,8 +404,12 @@ const choosePage = () => {
   );
 
   const doingWrap = methods.divCreate(doingChoose, "doing-wrap", "wrap-choose");
-  const willWrap = methods.divCreate(willDoChoose, "will-wrap", "wrap-choose");
-  const completedWrap = methods.divCreate(completedChoose, "completed-wrap", "wrap-choose");
+  const lateWrap = methods.divCreate(lateChoose, "Late-wrap", "wrap-choose");
+  const completedWrap = methods.divCreate(
+    completedChoose,
+    "completed-wrap",
+    "wrap-choose"
+  );
   const back = methods.divCreate(
     "",
     "back-choose",
@@ -390,7 +417,7 @@ const choosePage = () => {
     SvgPict().returnIcon
   );
 
-  choose.append(doingWrap, willWrap, completedWrap, back);
+  choose.append(doingWrap, lateWrap, completedWrap, back);
 
   return choose;
 };
@@ -525,7 +552,7 @@ seeBtn.addEventListener("click", () => {
   useLoadAndCheck();
 
   writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
-  writeLoader("will", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("late", seePage("0", "see").myPage, src, chooseS);
   writeLoader("completed", seePage("0", "see").myPage, src, chooseS);
 
   returnBtn(main);
