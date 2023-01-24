@@ -71,13 +71,53 @@ function _interopRequireWildcard(obj) {
 
 var src = methods.divCreate("", "src");
 
+var idGet = function idGet() {
+  var idCalled = localStorage.getItem("Id");
+  return idCalled;
+};
+
+var idSet = function idSet(value) {
+  var idChanged = localStorage.setItem("Id", "".concat(value));
+  return idChanged;
+};
+
+var arrWithLocal = [];
+
 var checkIfId = function checkIfId() {
   if (!localStorage.getItem("Id")) {
     localStorage.setItem("Id", "0");
+    return false;
   }
+
+  return true;
 };
 
-checkIfId();
+var loadArr = function loadArr() {
+  var curId = parseInt(idGet(), 10);
+
+  if (checkIfId() === true && curId > arrWithLocal.length) {
+    for (var i = 0; i < curId; i += 1) {
+      var localVal = {
+        name: localStorage.getItem("name-".concat(i)),
+        time: localStorage.getItem("time-".concat(i)),
+        date: localStorage.getItem("date-".concat(i)),
+        text: localStorage.getItem("text-".concat(i)),
+      };
+      arrWithLocal.push(localVal);
+    }
+
+    return arrWithLocal;
+  }
+
+  return false;
+};
+
+var useLoadAndCheck = function useLoadAndCheck() {
+  checkIfId();
+  loadArr();
+};
+
+useLoadAndCheck();
 
 function storageAvailable(type) {
   var storage;
@@ -125,16 +165,6 @@ function findItem(id, item) {
 
   return localStorage.getItem("".concat(item, "-").concat(id));
 }
-
-var idGet = function idGet() {
-  var idCalled = localStorage.getItem("Id");
-  return idCalled;
-};
-
-var idSet = function idSet(value) {
-  var idChanged = localStorage.setItem("Id", "".concat(value));
-  return idChanged;
-};
 
 var itemsCount = function itemsCount() {
   var currentId = localStorage.getItem("Id");
@@ -317,14 +347,6 @@ var TodoSubmit = function TodoSubmit(pageName) {
   return wrappedBtn;
 };
 
-var TodoShowName = function TodoShowName() {};
-
-var TodoShowTime = function TodoShowTime() {};
-
-var TodoShowDate = function TodoShowDate() {};
-
-var TodoShowText = function TodoShowText() {};
-
 function WritingPages(pageName) {
   this.page = methods.divCreate(
     "",
@@ -418,7 +440,6 @@ var choosePage = function choosePage() {
 };
 
 var seePage = function seePage(id, value) {
-  console.log(id);
   var chosen = new SeePage(id, value);
   var myPage = chosen.page;
   var myField = chosen.field;
@@ -433,7 +454,7 @@ var returnBtn = function returnBtn(value) {
   returnBtns.addEventListener("click", function () {
     src.innerHTML = "";
     src.append(value);
-    checkIfId();
+    useLoadAndCheck();
   });
   return returnBtns;
 };
@@ -462,12 +483,14 @@ var seeBtnsLogic = function seeBtnsLogic(value, id) {
   var prev = checkPage(value).prevBtn;
   var currId = id;
   next.addEventListener("click", function () {
-    if (currId < idGet()) {
+    useLoadAndCheck();
+
+    if (currId < idGet() - 1) {
       currId += 1;
       field.innerHTML = "";
       var stringNum = currId.toString();
       field.append(seePage(stringNum, "see").myField);
-    } else if (currId === itemsCount()) {
+    } else if (currId === idGet() - 1) {
       currId = 0;
       field.innerHTML = "";
 
@@ -477,13 +500,15 @@ var seeBtnsLogic = function seeBtnsLogic(value, id) {
     }
   });
   prev.addEventListener("click", function () {
+    useLoadAndCheck();
+
     if (currId > 0) {
       currId -= 1;
       field.innerHTML = "";
       var stringNum = currId.toString();
       field.append(seePage(stringNum, "see").myField);
     } else if (currId === 0) {
-      currId = 0;
+      currId = idGet() - 1;
       field.innerHTML = "";
 
       var _stringNum2 = currId.toString();
@@ -511,6 +536,7 @@ var writeSubmit = function writeSubmit(value) {
     localItem(FirstItem, nowId);
     var changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
+    useLoadAndCheck();
   });
   return submit;
 };
@@ -535,14 +561,14 @@ addBtn.addEventListener("click", function () {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
-  checkIfId();
+  useLoadAndCheck();
   writeSubmit(src);
   returnBtn(main);
 });
 seeBtn.addEventListener("click", function () {
   src.innerHTML = "";
   src.append(chooseS);
-  checkIfId();
+  useLoadAndCheck();
   writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
   writeLoader("will", seePage("0", "see").myPage, src, chooseS);
   writeLoader("done", seePage("0", "see").myPage, src, chooseS);

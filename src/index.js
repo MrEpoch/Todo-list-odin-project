@@ -3,13 +3,50 @@ import "./style.css";
 import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
+
+const idGet = () => {
+  const idCalled = localStorage.getItem("Id");
+  return idCalled;
+};
+
+const idSet = (value) => {
+  const idChanged = localStorage.setItem("Id", `${value}`);
+  return idChanged;
+};
+
+let arrWithLocal = [];
+
 const checkIfId = () => {
   if (!localStorage.getItem("Id")) {
     localStorage.setItem("Id", "0");
+    return false;
   }
+  return true;
 };
 
-checkIfId();
+const loadArr = () => {
+  let curId = parseInt(idGet(), 10);
+  if (checkIfId() === true && curId > arrWithLocal.length) {
+    for (let i = 0; i < curId; i += 1) {
+      let localVal = {
+        name: localStorage.getItem(`name-${i}`),
+        time: localStorage.getItem(`time-${i}`),
+        date: localStorage.getItem(`date-${i}`),
+        text: localStorage.getItem(`text-${i}`),
+      };
+      arrWithLocal.push(localVal);
+    }
+    return arrWithLocal;
+  }
+  return false;
+};
+
+const useLoadAndCheck = () => {
+  checkIfId();
+  loadArr();
+};
+
+useLoadAndCheck();
 
 function storageAvailable(type) {
   let storage;
@@ -62,16 +99,6 @@ function findItem(id, item) {
 
   return localStorage.getItem(`${item}-${id}`);
 }
-
-const idGet = () => {
-  const idCalled = localStorage.getItem("Id");
-  return idCalled;
-};
-
-const idSet = (value) => {
-  const idChanged = localStorage.setItem("Id", `${value}`);
-  return idChanged;
-};
 
 const itemsCount = () => {
   const currentId = localStorage.getItem("Id");
@@ -252,14 +279,6 @@ const TodoSubmit = (pageName) => {
   return wrappedBtn;
 };
 
-const TodoShowName = () => {};
-
-const TodoShowTime = () => {};
-
-const TodoShowDate = () => {};
-
-const TodoShowText = () => {};
-
 function WritingPages(pageName) {
   this.page = methods.divCreate(
     "",
@@ -367,7 +386,6 @@ const choosePage = () => {
 };
 
 const seePage = (id, value) => {
-  console.log(id);
   const chosen = new SeePage(id, value);
   const myPage = chosen.page;
   const myField = chosen.field;
@@ -381,7 +399,7 @@ const returnBtn = (value) => {
   returnBtns.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(value);
-    checkIfId();
+    useLoadAndCheck();
   });
 
   return returnBtns;
@@ -409,12 +427,13 @@ const seeBtnsLogic = (value, id) => {
   const prev = checkPage(value).prevBtn;
   let currId = id;
   next.addEventListener("click", () => {
-    if (currId < idGet()) {
+    useLoadAndCheck();
+    if (currId < idGet() - 1) {
       currId += 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
       field.append(seePage(stringNum, "see").myField);
-    } else if (currId === itemsCount()) {
+    } else if (currId === idGet() - 1) {
       currId = 0;
       field.innerHTML = "";
       const stringNum = currId.toString();
@@ -422,13 +441,14 @@ const seeBtnsLogic = (value, id) => {
     }
   });
   prev.addEventListener("click", () => {
+    useLoadAndCheck();
     if (currId > 0) {
       currId -= 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
       field.append(seePage(stringNum, "see").myField);
     } else if (currId === 0) {
-      currId = 0;
+      currId = idGet() - 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
       field.append(seePage(stringNum, "see").myField);
@@ -454,8 +474,8 @@ const writeSubmit = (value) => {
     localItem(FirstItem, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
+    useLoadAndCheck();
   });
-
   return submit;
 };
 
@@ -481,7 +501,8 @@ addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
-  checkIfId();
+
+  useLoadAndCheck();
 
   writeSubmit(src);
   returnBtn(main);
@@ -490,7 +511,8 @@ addBtn.addEventListener("click", () => {
 seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(chooseS);
-  checkIfId();
+
+  useLoadAndCheck();
 
   writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
   writeLoader("will", seePage("0", "see").myPage, src, chooseS);
