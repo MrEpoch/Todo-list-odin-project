@@ -64,7 +64,7 @@ body {
 #doing,
 #will,
 #write,
-#done {
+#completed {
   display: grid;
   grid-template-rows: 1fr 3.5fr 1fr;
 }
@@ -104,6 +104,15 @@ input[type="time"] {
 input[type="date"] {
   width: 120px;
   height: 30px;
+}
+
+.projDoneContainer {
+  position: absolute;
+  top: 350px;
+}
+
+.projDoneContainer > label {
+  padding: 10px;
 }
 
 .projTextContainer {
@@ -174,7 +183,7 @@ textarea {
   width: 100%;
 }
 
-.page-done-container {
+.page-completed-container {
   background-image: url("./components/images/done.jpg");
   background-position: center;
   background-size: cover;
@@ -246,7 +255,7 @@ textarea {
   width: 100%;
 }
 
-.done-wrap {
+.completed-wrap {
   background-image: url("./components/images/done.jpg");
   background-position: center;
   background-size: cover;
@@ -297,7 +306,7 @@ textarea {
   font-size: 15px;
   border-bottom: 2px solid black;
   border-radius: 10px;
-  width: 80px;
+  width: 100px;
   text-align: center;
 }
 

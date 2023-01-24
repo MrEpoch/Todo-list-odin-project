@@ -134,11 +134,11 @@ const checkPage = (value) => {
     btnLogic = value.children["0"].children["3"];
     pageBtns.doingBtns = value.children["0"].children["0"].children["0"];
     pageBtns.willBtns = value.children["0"].children["1"].children["0"];
-    pageBtns.doneBtns = value.children["0"].children["2"].children["0"];
+    pageBtns.completedBtns = value.children["0"].children["2"].children["0"];
   } else if (
     currentPage === "doing" ||
     currentPage === "will" ||
-    currentPage === "done" ||
+    currentPage === "completed" ||
     currentPage === "write"
   ) {
     btnLogic = value.children["0"].children["0"];
@@ -186,17 +186,17 @@ const content = () => {
   const cardsInner = {
     doingH4: methods.h4Create("Doing", "doing-content"),
     willH4: methods.h4Create("Will do", "will-do-content"),
-    doneH4: methods.h4Create("Done", "done-content"),
+    completedH4: methods.h4Create("completed", "completed-content"),
   };
 
   const doing = Card(cardsInner.doingH4);
   const will = Card(cardsInner.willH4);
-  const done = Card(cardsInner.doneH4);
+  const completed = Card(cardsInner.completedH4);
 
   const add = methods.divCreate("", "add-item", "", SvgPict().plusIcon);
   const see = methods.divCreate("", "see-item", "", SvgPict().noteIcon);
 
-  myContent.append(doing, will, done, add, see);
+  myContent.append(doing, will, completed, add, see);
   const addHtml = myContent.children["3"];
 
   addHtml.addEventListener("mouseover", () => {
@@ -266,6 +266,15 @@ const TodoText = (pageName) => {
 
   return TodoTextContainer;
 };
+const TodocompletedOr = (pagename) => {
+  const TodocompletedContainer = methods.divCreate("", "projDoneContainer");
+  const TodocompletedLabel = methods.methodCreate("label", "completed")
+  const TodocompletedInside = methods.inputCreate("", "done", "checkbox");
+
+  TodocompletedContainer.append(TodocompletedLabel ,TodocompletedInside);
+
+  return TodocompletedContainer;
+}
 const TodoSubmit = (pageName) => {
   const submitBtn = methods.methodCreate(
     "button",
@@ -297,6 +306,7 @@ function WritingPages(pageName) {
     TodoName(`${pageName}`),
     TodoTime(`${pageName}`),
     TodoDate(`${pageName}`),
+    TodocompletedOr(`${pageName}`),
     TodoText(`${pageName}`)
   );
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
@@ -354,7 +364,7 @@ const choosePage = () => {
   const chooseText = {
     doing: "Doing",
     will: "Will do",
-    done: "Done",
+    completed: "completed",
   };
 
   const doingChoose = methods.divCreate(
@@ -365,14 +375,14 @@ const choosePage = () => {
     methods.h3Create(chooseText.will, "will-choose-h3"),
     "will-choose-div"
   );
-  const doneChoose = methods.divCreate(
-    methods.h3Create(chooseText.done, "done-choose-h3"),
-    "done-choose-div"
+  const completedChoose = methods.divCreate(
+    methods.h3Create(chooseText.completed, "completed-choose-h3"),
+    "completed-choose-div"
   );
 
   const doingWrap = methods.divCreate(doingChoose, "doing-wrap", "wrap-choose");
   const willWrap = methods.divCreate(willDoChoose, "will-wrap", "wrap-choose");
-  const doneWrap = methods.divCreate(doneChoose, "done-wrap", "wrap-choose");
+  const completedWrap = methods.divCreate(completedChoose, "completed-wrap", "wrap-choose");
   const back = methods.divCreate(
     "",
     "back-choose",
@@ -380,7 +390,7 @@ const choosePage = () => {
     SvgPict().returnIcon
   );
 
-  choose.append(doingWrap, willWrap, doneWrap, back);
+  choose.append(doingWrap, willWrap, completedWrap, back);
 
   return choose;
 };
@@ -516,7 +526,7 @@ seeBtn.addEventListener("click", () => {
 
   writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
   writeLoader("will", seePage("0", "see").myPage, src, chooseS);
-  writeLoader("done", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("completed", seePage("0", "see").myPage, src, chooseS);
 
   returnBtn(main);
 });
