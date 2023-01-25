@@ -82,6 +82,7 @@ var idSet = function idSet(value) {
 };
 
 var arrWithLocal = [];
+var myMeasure = [];
 
 var checkIfId = function checkIfId() {
   if (!localStorage.getItem("Id")) {
@@ -118,6 +119,7 @@ var useLoadAndCheck = function useLoadAndCheck() {
 };
 
 useLoadAndCheck();
+console.log(threeValues, arrWithLocal);
 
 function storageAvailable(type) {
   var storage;
@@ -142,11 +144,12 @@ function storageAvailable(type) {
   }
 }
 
-function NewItem(itemId, name, time, date, text) {
+function NewItem(itemId, name, time, date, completed, text) {
   this.itemId = itemId;
   this.name = name;
   this.time = time;
   this.date = date;
+  this.completed = completed;
   this.text = text;
 }
 
@@ -154,6 +157,7 @@ function localItem(itemObject, idlocal) {
   localStorage.setItem("name-".concat(idlocal), itemObject.name);
   localStorage.setItem("time-".concat(idlocal), itemObject.time);
   localStorage.setItem("date-".concat(idlocal), itemObject.date);
+  localStorage.setItem("completed-".concat(idlocal), itemObject.completed);
   localStorage.setItem("text-".concat(idlocal), itemObject.text);
   return localStorage;
 }
@@ -181,25 +185,79 @@ function LoadH(hType, hValue) {
 // else {
 //   // Too bad, no localStorage for us
 // }
+// date === 0-Year, 1-month, 2-day
 
-console.log(arrWithLocal[1].date.split("-")["2"]); // date === 0-Year, 1-month, 2-day
-
-var order = function order() {
-  var dateContainer;
+var lateCheck = function lateCheck() {
+  var dateContainer = [];
+  var timeContainer = [];
 
   for (var i = 0; i < arrWithLocal.length; i += 1) {
     if (arrWithLocal[i].date) {
       var curDate = new Date();
       var curYear = curDate.getFullYear();
-      var curDay = curDate.getDay();
       var curMonth = curDate.getMonth();
+      var curDay = curDate.getDay();
+      var curHour = curDate.getHours();
+      var curMinute = curDate.getMinutes();
       dateContainer[i] = arrWithLocal[i].date.split("-");
+      timeContainer[i] = arrWithLocal[i].time.split(":");
 
-      if (dateContainer[i]["0"] < curYear) {
-        if (dateContainer[i]["1"] < curMonth) {
-          if (dateContainer[i]["2"] < curDay) {
+      if (dateContainer[i]["0"] >= curYear) {
+        if (
+          dateContainer[i]["1"] >= curMonth &&
+          dateContainer[i]["0"] === curYear
+        ) {
+          if (
+            dateContainer[i]["2"] >= curDay &&
+            dateContainer[i]["1"] === curMonth
+          ) {
+            if (
+              timeContainer[i]["0"] >= curHour &&
+              dateContainer[i]["2"] === curDay
+            ) {
+              if (
+                timeContainer[i]["1"] >= curMinute &&
+                timeContainer[i]["0"] === curHour
+              ) {
+                arrWithLocal[i].late = false;
+              } else {
+                arrWithLocal[i].late = true;
+              }
+
+              arrWithLocal[i].late = false;
+            } else {
+              arrWithLocal[i].late = true;
+            }
+
+            arrWithLocal[i].late = false;
+          } else {
+            arrWithLocal[i].late = true;
           }
+
+          arrWithLocal[i].late = false;
+        } else {
+          arrWithLocal[i].late = true;
         }
+
+        arrWithLocal[i].late = false;
+      } else {
+        arrWithLocal[i].late = true;
+      }
+    }
+  }
+};
+
+lateCheck();
+
+var assignPlace = function assignPlace() {
+  for (var i = 0; i < arrWithLocal.length; i += 1) {
+    if (arrWithLocal[i].completed === true) {
+      arrWithLocal[i].place = "completed";
+    } else if (arrWithLocal[i].completed === false) {
+      if (arrWithLocal[i].late === true) {
+        arrWithLocal[i].place = "late";
+      } else if (arrWithLocal[i].late === false) {
+        arrWithLocal[i].place = "doing";
       }
     }
   }
@@ -561,18 +619,22 @@ var writeSubmit = function writeSubmit(value) {
     var input = value.children[0].children["1"].children["0"].children["1"];
     var time = value.children[0].children["1"].children["1"].children["1"];
     var date = value.children[0].children["1"].children["2"].children["1"];
-    var textA = value.children[0].children["1"].children["3"].children["0"];
+    var completed = value.children[0].children["1"].children["3"].children["1"];
+    console.log(completed.checked);
+    var textA = value.children[0].children["1"].children["4"].children["0"];
     var FirstItem = new NewItem(
       nowId,
       input.value,
       time.value,
       date.value,
+      completed.checked,
       textA.value
     );
     localItem(FirstItem, nowId);
     var changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
     useLoadAndCheck();
+    lateCheck();
   });
   return submit;
 };
