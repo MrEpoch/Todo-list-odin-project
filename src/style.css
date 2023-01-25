@@ -234,6 +234,21 @@ textarea {
   background-color: white;
 }
 
+.item-name,
+.item-time,
+.item-date,
+.item-text {
+  display: flex;
+  padding: 5px;
+}
+
+.item-name > h3,
+.item-time > h3,
+.item-date > h3,
+.item-text > h3 {
+  padding-left: 15px;
+}
+
 #wrap-choose > div:hover {
   background-color: rgba(224, 221, 221, 0.627);
   cursor: pointer;

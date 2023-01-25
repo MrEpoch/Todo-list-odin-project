@@ -70,6 +70,7 @@ function _interopRequireWildcard(obj) {
 }
 
 var src = methods.divCreate("", "src");
+var idArr = [];
 
 var idGet = function idGet() {
   var idCalled = localStorage.getItem("Id");
@@ -119,7 +120,6 @@ var useLoadAndCheck = function useLoadAndCheck() {
 };
 
 useLoadAndCheck();
-console.log(threeValues, arrWithLocal);
 
 function storageAvailable(type) {
   var storage;
@@ -144,8 +144,7 @@ function storageAvailable(type) {
   }
 }
 
-function NewItem(itemId, name, time, date, completed, text) {
-  this.itemId = itemId;
+function NewItem(name, time, date, completed, text) {
   this.name = name;
   this.time = time;
   this.date = date;
@@ -153,17 +152,12 @@ function NewItem(itemId, name, time, date, completed, text) {
   this.text = text;
 }
 
-function localItem(itemObject, idlocal) {
-  localStorage.setItem("name-".concat(idlocal), itemObject.name);
-  localStorage.setItem("time-".concat(idlocal), itemObject.time);
-  localStorage.setItem("date-".concat(idlocal), itemObject.date);
-  localStorage.setItem("completed-".concat(idlocal), itemObject.completed);
-  localStorage.setItem("text-".concat(idlocal), itemObject.text);
-  return localStorage;
+function localItem(itemObject, id) {
+  localStorage.setItem("".concat(id), JSON.stringify(itemObject));
 }
 
 function findItem(id, item) {
-  if (localStorage.getItem("".concat(item, "-").concat(id)) === null) {
+  if (localStorage.getItem("".concat(id)) === null) {
     return "empty";
   }
 
@@ -262,6 +256,8 @@ var assignPlace = function assignPlace() {
     }
   }
 };
+
+assignPlace();
 
 var checkPage = function checkPage(value) {
   var currentPage = value.children["0"].id;
@@ -459,11 +455,14 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit("".concat(pageName)));
 }
 
+console.log(JSON.parse(localStorage.getItem("0")));
+
 function SeePage(id, value) {
-  this.nameItem = findItem(id, "name");
-  this.timeItem = findItem(id, "time");
-  this.dateItem = findItem(id, "date");
-  this.textItem = findItem(id, "text");
+  this.valueOfJ = JSON.parse(localStorage.getItem("".concat(id)));
+  this.nameItem = this.valueOfJ.name;
+  this.timeItem = this.valueOfJ.time;
+  this.dateItem = this.valueOfJ.date;
+  this.textItem = this.valueOfJ.text;
   this.page = methods.divCreate("", "page-".concat(value));
   this.page.id = "see";
   this.field = methods.fieldsetCreate("", "field-Re");
@@ -475,10 +474,14 @@ function SeePage(id, value) {
   );
   this.next = methods.methodCreate("button", "next", "btn-next");
   this.prev = methods.methodCreate("button", "previus", "btn-prev");
-  this.name = methods.divCreate(LoadH("h3", this.nameItem), "item-name");
-  this.time = methods.divCreate(LoadH("h3", this.timeItem), "item-time");
-  this.date = methods.divCreate(LoadH("h3", this.dateItem), "item-date");
-  this.text = methods.divCreate(LoadH("h3", this.textItem), "item-text");
+  this.name = methods.divCreate("Name:", "item-name");
+  this.name.append(LoadH("h3", this.nameItem));
+  this.time = methods.divCreate("Time:", "item-time");
+  this.time.append(LoadH("h3", this.timeItem));
+  this.date = methods.divCreate("Date:", "item-date");
+  this.date.append(LoadH("h3", this.dateItem));
+  this.text = methods.divCreate("Text:", "item-text");
+  this.text.append(LoadH("h3", this.textItem));
   this.field.append(this.name, this.time, this.date, this.text);
   this.nextContainer = methods.divCreate("", "btn-next-container");
   this.prevContainer = methods.divCreate("", "btn-prev-container");
@@ -620,21 +623,20 @@ var writeSubmit = function writeSubmit(value) {
     var time = value.children[0].children["1"].children["1"].children["1"];
     var date = value.children[0].children["1"].children["2"].children["1"];
     var completed = value.children[0].children["1"].children["3"].children["1"];
-    console.log(completed.checked);
     var textA = value.children[0].children["1"].children["4"].children["0"];
-    var FirstItem = new NewItem(
-      nowId,
+    var Item = new NewItem(
       input.value,
       time.value,
       date.value,
       completed.checked,
       textA.value
     );
-    localItem(FirstItem, nowId);
+    localItem(Item, nowId);
     var changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
     useLoadAndCheck();
     lateCheck();
+    assignPlace();
   });
   return submit;
 };

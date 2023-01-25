@@ -4,6 +4,8 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
 
+const idArr = [];
+
 const idGet = () => {
   const idCalled = localStorage.getItem("Id");
   return idCalled;
@@ -48,7 +50,6 @@ const useLoadAndCheck = () => {
 };
 
 useLoadAndCheck();
-console.log(threeValues, arrWithLocal);
 function storageAvailable(type) {
   let storage;
   try {
@@ -76,8 +77,7 @@ function storageAvailable(type) {
   }
 }
 
-function NewItem(itemId, name, time, date, completed, text) {
-  this.itemId = itemId;
+function NewItem(name, time, date, completed, text) {
   this.name = name;
   this.time = time;
   this.date = date;
@@ -85,18 +85,12 @@ function NewItem(itemId, name, time, date, completed, text) {
   this.text = text;
 }
 
-function localItem(itemObject, idlocal) {
-  localStorage.setItem(`name-${idlocal}`, itemObject.name);
-  localStorage.setItem(`time-${idlocal}`, itemObject.time);
-  localStorage.setItem(`date-${idlocal}`, itemObject.date);
-  localStorage.setItem(`completed-${idlocal}`, itemObject.completed);
-  localStorage.setItem(`text-${idlocal}`, itemObject.text);
-
-  return localStorage;
+function localItem(itemObject, id) {
+  localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
 function findItem(id, item) {
-  if (localStorage.getItem(`${item}-${id}`) === null) {
+  if (localStorage.getItem(`${id}`) === null) {
     return "empty";
   }
 
@@ -193,6 +187,8 @@ const assignPlace = () => {
     }
   }
 };
+
+assignPlace();
 
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
@@ -386,12 +382,13 @@ function WritingPages(pageName) {
   );
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
-
+console.log(JSON.parse(localStorage.getItem("0")));
 function SeePage(id, value) {
-  this.nameItem = findItem(id, "name");
-  this.timeItem = findItem(id, "time");
-  this.dateItem = findItem(id, "date");
-  this.textItem = findItem(id, "text");
+  this.valueOfJ = JSON.parse(localStorage.getItem(`${id}`));
+  this.nameItem = this.valueOfJ.name;
+  this.timeItem = this.valueOfJ.time;
+  this.dateItem = this.valueOfJ.date;
+  this.textItem = this.valueOfJ.text;
 
   this.page = methods.divCreate("", `page-${value}`);
   this.page.id = "see";
@@ -407,10 +404,14 @@ function SeePage(id, value) {
   this.next = methods.methodCreate("button", "next", "btn-next");
   this.prev = methods.methodCreate("button", "previus", "btn-prev");
 
-  this.name = methods.divCreate(LoadH("h3", this.nameItem), "item-name");
-  this.time = methods.divCreate(LoadH("h3", this.timeItem), "item-time");
-  this.date = methods.divCreate(LoadH("h3", this.dateItem), "item-date");
-  this.text = methods.divCreate(LoadH("h3", this.textItem), "item-text");
+  this.name = methods.divCreate("Name:", "item-name");
+  this.name.append(LoadH("h3", this.nameItem));
+  this.time = methods.divCreate("Time:", "item-time");
+  this.time.append(LoadH("h3", this.timeItem));
+  this.date = methods.divCreate("Date:", "item-date");
+  this.date.append(LoadH("h3", this.dateItem));
+  this.text = methods.divCreate("Text:", "item-text");
+  this.text.append(LoadH("h3", this.textItem));
 
   this.field.append(this.name, this.time, this.date, this.text);
 
@@ -554,21 +555,20 @@ const writeSubmit = (value) => {
     const date = value.children[0].children["1"].children["2"].children["1"];
     const completed =
       value.children[0].children["1"].children["3"].children["1"];
-    console.log(completed.checked);
     const textA = value.children[0].children["1"].children["4"].children["0"];
-    const FirstItem = new NewItem(
-      nowId,
+    const Item = new NewItem(
       input.value,
       time.value,
       date.value,
       completed.checked,
       textA.value
     );
-    localItem(FirstItem, nowId);
+    localItem(Item, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
     useLoadAndCheck();
     lateCheck();
+    assignPlace();
   });
   return submit;
 };
