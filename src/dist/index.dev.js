@@ -82,6 +82,10 @@ var idSet = function idSet(value) {
   return idChanged;
 };
 
+function localItem(itemObject, id) {
+  localStorage.setItem("".concat(id), JSON.stringify(itemObject));
+}
+
 var arrWithLocal = [];
 var myMeasure = [];
 
@@ -167,10 +171,6 @@ function NewItem(name, time, date, completed, text) {
   this.text = text;
 }
 
-function localItem(itemObject, id) {
-  localStorage.setItem("".concat(id), JSON.stringify(itemObject));
-}
-
 var itemsCount = function itemsCount() {
   var currentId = localStorage.getItem("Id");
   var IntId = parseInt(currentId, 10) + 1;
@@ -248,17 +248,37 @@ var lateCheck = function lateCheck() {
   }
 };
 
+var reLate = function reLate() {
+  for (var i = 0; i < arrWithLocal.length; i += 1) {
+    var value = JSON.parse(localStorage.getItem(i.toString()));
+    value.late = arrWithLocal[i].late;
+    localStorage.setItem(i.toString(), JSON.stringify(value));
+  }
+};
+
 lateCheck();
+reLate();
+console.log(arrWithLocal[0]);
 
 var assignPlace = function assignPlace() {
-  for (var i = 0; i < arrWithLocal.length; i += 1) {
-    if (arrWithLocal[i].completed === true) {
+  var numOfItems = localStorage.length - 1;
+
+  for (var i = 0; i < numOfItems; i += 1) {
+    var value = JSON.parse(localStorage.getItem(i.toString()));
+
+    if (value.completed === true) {
       arrWithLocal[i].place = "completed";
-    } else if (arrWithLocal[i].completed === false) {
-      if (arrWithLocal[i].late === true) {
+      value.place = arrWithLocal[i].place;
+      localStorage.setItem(i.toString(), JSON.stringify(value));
+    } else if (value.completed === false) {
+      if (value.late === true) {
         arrWithLocal[i].place = "late";
-      } else if (arrWithLocal[i].late === false) {
+        value.place = arrWithLocal[i].place;
+        localStorage.setItem(i.toString(), JSON.stringify(value));
+      } else if (value.late === false) {
         arrWithLocal[i].place = "doing";
+        value.place = arrWithLocal[i].place;
+        localStorage.setItem(i.toString(), JSON.stringify(value));
       }
     }
   }
@@ -485,14 +505,17 @@ var returnType = function returnType() {
   if (!arrWithLocal.length === 0) {
     for (var i = 0; i < arrWithLocal.length; i += 1) {
       if (arrWithLocal[i].place === "doing") {
+        arrWithLocal.typeId = i;
         doingArr.push(arrWithLocal[i]);
       }
 
       if (arrWithLocal[i].place === "late") {
+        arrWithLocal.typeId = i;
         lateArr.push(arrWithLocal[i]);
       }
 
       if (arrWithLocal[i].place === "completed") {
+        arrWithLocal.typeId = i;
         completedArr.push(arrWithLocal[i]);
       }
     }
@@ -501,7 +524,17 @@ var returnType = function returnType() {
 
 returnType();
 
-function SeePage(id, value, page) {
+var idSeeCheck = function idSeeCheck(id, page) {
+  var checkingValue = requestItem(id, "place");
+
+  if (checkingValue === page) {
+    return true;
+  }
+
+  return false;
+};
+
+function SeePage(id, value) {
   this.nameItem = requestItem(id, "name");
   this.timeItem = requestItem(id, "time");
   this.dateItem = requestItem(id, "date");
@@ -580,7 +613,15 @@ var choosePage = function choosePage() {
 };
 
 var seePage = function seePage(id, value, page) {
-  var chosen = new SeePage(id, value, page);
+  var chosen = new SeePage(id, value);
+
+  if (idSeeCheck(id, page) === false) {
+    chosen.name.innerHTML = "empty";
+    chosen.time.innerHTML = "empty";
+    chosen.date.innerHTML = "empty";
+    chosen.text.innerHTML = "empty";
+  }
+
   var myPage = chosen.page;
   var myField = chosen.field;
   return {
@@ -617,7 +658,7 @@ if (navbar() && content()) {
 
 var chooseS = choosePage();
 
-var seeBtnsLogic = function seeBtnsLogic(value, id) {
+var seeBtnsLogic = function seeBtnsLogic(value, id, page) {
   var field = value.children["0"].children["1"];
   var next = checkPage(value).nextBtn;
   var prev = checkPage(value).prevBtn;
@@ -629,14 +670,14 @@ var seeBtnsLogic = function seeBtnsLogic(value, id) {
       currId += 1;
       field.innerHTML = "";
       var stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     } else if (currId === idGet() - 1) {
       currId = 0;
       field.innerHTML = "";
 
       var _stringNum = currId.toString();
 
-      field.append(seePage(_stringNum, "see").myField);
+      field.append(seePage(_stringNum, "see", page).myField);
     }
   });
   prev.addEventListener("click", function () {
@@ -646,14 +687,14 @@ var seeBtnsLogic = function seeBtnsLogic(value, id) {
       currId -= 1;
       field.innerHTML = "";
       var stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     } else if (currId === 0) {
       currId = idGet() - 1;
       field.innerHTML = "";
 
       var _stringNum2 = currId.toString();
 
-      field.append(seePage(_stringNum2, "see").myField);
+      field.append(seePage(_stringNum2, "see", page).myField);
     }
   });
 };
@@ -674,6 +715,7 @@ var writeSubmit = function writeSubmit(value) {
       completed.checked,
       textA.value
     );
+    console.log(Item);
     localItem(Item, nowId);
     var changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
@@ -692,7 +734,7 @@ var writeLoader = function writeLoader(btn, page, value, returnPage) {
       src.innerHTML = "";
       src.append(page);
       returnBtn(returnPage);
-      seeBtnsLogic(value, 0);
+      seeBtnsLogic(value, 0, btn);
     });
   }
 };

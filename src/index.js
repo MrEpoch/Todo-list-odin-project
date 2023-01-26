@@ -16,6 +16,10 @@ const idSet = (value) => {
   return idChanged;
 };
 
+function localItem(itemObject, id) {
+  localStorage.setItem(`${id}`, JSON.stringify(itemObject));
+}
+
 let arrWithLocal = [];
 let myMeasure = [];
 
@@ -62,6 +66,7 @@ const useLoadAndCheck = () => {
 };
 
 useLoadAndCheck();
+
 function storageAvailable(type) {
   let storage;
   try {
@@ -95,10 +100,6 @@ function NewItem(name, time, date, completed, text) {
   this.date = date;
   this.completed = completed;
   this.text = text;
-}
-
-function localItem(itemObject, id) {
-  localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
 const itemsCount = () => {
@@ -176,17 +177,37 @@ const lateCheck = () => {
   }
 };
 
+const reLate = () => {
+  for (let i = 0; i < arrWithLocal.length; i += 1) {
+    const value = JSON.parse(localStorage.getItem(i.toString()));
+    value.late = arrWithLocal[i].late;
+    localStorage.setItem(i.toString(), JSON.stringify(value));
+  }
+};
+
 lateCheck();
 
+reLate();
+
+console.log(arrWithLocal[0]);
+
 const assignPlace = () => {
-  for (let i = 0; i < arrWithLocal.length; i += 1) {
-    if (arrWithLocal[i].completed === true) {
+  const numOfItems = localStorage.length - 1;
+  for (let i = 0; i < numOfItems; i += 1) {
+    const value = JSON.parse(localStorage.getItem(i.toString()));
+    if (value.completed === true) {
       arrWithLocal[i].place = "completed";
-    } else if (arrWithLocal[i].completed === false) {
-      if (arrWithLocal[i].late === true) {
+      value.place = arrWithLocal[i].place;
+      localStorage.setItem(i.toString(), JSON.stringify(value));
+    } else if (value.completed === false) {
+      if (value.late === true) {
         arrWithLocal[i].place = "late";
-      } else if (arrWithLocal[i].late === false) {
+        value.place = arrWithLocal[i].place;
+        localStorage.setItem(i.toString(), JSON.stringify(value));
+      } else if (value.late === false) {
         arrWithLocal[i].place = "doing";
+        value.place = arrWithLocal[i].place;
+        localStorage.setItem(i.toString(), JSON.stringify(value));
       }
     }
   }
@@ -409,12 +430,15 @@ const returnType = () => {
   if (!arrWithLocal.length === 0) {
     for (let i = 0; i < arrWithLocal.length; i += 1) {
       if (arrWithLocal[i].place === "doing") {
+        arrWithLocal.typeId = i;
         doingArr.push(arrWithLocal[i]);
       }
       if (arrWithLocal[i].place === "late") {
+        arrWithLocal.typeId = i;
         lateArr.push(arrWithLocal[i]);
       }
       if (arrWithLocal[i].place === "completed") {
+        arrWithLocal.typeId = i;
         completedArr.push(arrWithLocal[i]);
       }
     }
@@ -423,7 +447,15 @@ const returnType = () => {
 
 returnType();
 
-function SeePage(id, value, page) {
+const idSeeCheck = (id, page) => {
+  const checkingValue = requestItem(id, "place");
+  if (checkingValue === page) {
+    return true;
+  }
+  return false;
+};
+
+function SeePage(id, value) {
   this.nameItem = requestItem(id, "name");
   this.timeItem = requestItem(id, "time");
   this.dateItem = requestItem(id, "date");
@@ -515,7 +547,13 @@ const choosePage = () => {
 };
 
 const seePage = (id, value, page) => {
-  const chosen = new SeePage(id, value, page);
+  const chosen = new SeePage(id, value);
+  if (idSeeCheck(id, page) === false) {
+    chosen.name.innerHTML = "empty";
+    chosen.time.innerHTML = "empty";
+    chosen.date.innerHTML = "empty";
+    chosen.text.innerHTML = "empty";
+  }
   const myPage = chosen.page;
   const myField = chosen.field;
   return { myPage, myField };
@@ -550,7 +588,7 @@ if (navbar() && content()) {
 }
 const chooseS = choosePage();
 
-const seeBtnsLogic = (value, id) => {
+const seeBtnsLogic = (value, id, page) => {
   const field = value.children["0"].children["1"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
@@ -561,12 +599,12 @@ const seeBtnsLogic = (value, id) => {
       currId += 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     } else if (currId === idGet() - 1) {
       currId = 0;
       field.innerHTML = "";
       const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     }
   });
   prev.addEventListener("click", () => {
@@ -575,12 +613,12 @@ const seeBtnsLogic = (value, id) => {
       currId -= 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     } else if (currId === 0) {
       currId = idGet() - 1;
       field.innerHTML = "";
       const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see").myField);
+      field.append(seePage(stringNum, "see", page).myField);
     }
   });
 };
@@ -602,6 +640,7 @@ const writeSubmit = (value) => {
       completed.checked,
       textA.value
     );
+    console.log(Item);
     localItem(Item, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
@@ -620,7 +659,7 @@ const writeLoader = (btn, page, value, returnPage) => {
       src.innerHTML = "";
       src.append(page);
       returnBtn(returnPage);
-      seeBtnsLogic(value, 0);
+      seeBtnsLogic(value, 0, btn);
     });
   }
 };
