@@ -27,15 +27,27 @@ const checkIfId = () => {
   return true;
 };
 
+const requestItem = (id, item) => {
+  if (!localStorage.getItem(`${id}`)) {
+    return "empty";
+  }
+  const itemsObject = JSON.parse(localStorage.getItem(`${id}`));
+  if (!itemsObject[item]) {
+    return "empty";
+  }
+  const requestedItem = itemsObject[item];
+  return requestedItem;
+};
+
 const loadArr = () => {
-  let curId = parseInt(idGet(), 10);
+  const curId = parseInt(idGet(), 10);
   if (checkIfId() === true && curId > arrWithLocal.length) {
     for (let i = 0; i < curId; i += 1) {
-      let localVal = {
-        name: localStorage.getItem(`name-${i}`),
-        time: localStorage.getItem(`time-${i}`),
-        date: localStorage.getItem(`date-${i}`),
-        text: localStorage.getItem(`text-${i}`),
+      const localVal = {
+        name: requestItem(i.toString(), "name"),
+        time: requestItem(i.toString(), "time"),
+        date: requestItem(i.toString(), "date"),
+        text: requestItem(i.toString(), "text"),
       };
       arrWithLocal.push(localVal);
     }
@@ -89,14 +101,6 @@ function localItem(itemObject, id) {
   localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
-function findItem(id, item) {
-  if (localStorage.getItem(`${id}`) === null) {
-    return "empty";
-  }
-
-  return localStorage.getItem(`${item}-${id}`);
-}
-
 const itemsCount = () => {
   const currentId = localStorage.getItem("Id");
   const IntId = parseInt(currentId, 10) + 1;
@@ -119,8 +123,8 @@ function LoadH(hType, hValue) {
 // date === 0-Year, 1-month, 2-day
 
 const lateCheck = () => {
-  let dateContainer = [];
-  let timeContainer = [];
+  const dateContainer = [];
+  const timeContainer = [];
   for (let i = 0; i < arrWithLocal.length; i += 1) {
     if (arrWithLocal[i].date) {
       const curDate = new Date();
@@ -221,6 +225,20 @@ const checkPage = (value) => {
   }
 
   return { btnLogic, pageBtns, submitBtns, writeBtns, nextBtn, prevBtn };
+};
+
+const myType = (id) => {
+  const myComplete = requestItem(id, "complete");
+  const myLate = requestItem(id, "complete");
+
+  if (myComplete === true) {
+    return "completed";
+  }
+  if (myLate === true) {
+    return "late";
+  }
+
+  return "doing";
 };
 
 //
@@ -382,13 +400,34 @@ function WritingPages(pageName) {
   );
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
-console.log(JSON.parse(localStorage.getItem("0")));
-function SeePage(id, value) {
-  this.valueOfJ = JSON.parse(localStorage.getItem(`${id}`));
-  this.nameItem = this.valueOfJ.name;
-  this.timeItem = this.valueOfJ.time;
-  this.dateItem = this.valueOfJ.date;
-  this.textItem = this.valueOfJ.text;
+
+const doingArr = [];
+const lateArr = [];
+const completedArr = [];
+
+const returnType = () => {
+  if (!arrWithLocal.length === 0) {
+    for (let i = 0; i < arrWithLocal.length; i += 1) {
+      if (arrWithLocal[i].place === "doing") {
+        doingArr.push(arrWithLocal[i]);
+      }
+      if (arrWithLocal[i].place === "late") {
+        lateArr.push(arrWithLocal[i]);
+      }
+      if (arrWithLocal[i].place === "completed") {
+        completedArr.push(arrWithLocal[i]);
+      }
+    }
+  }
+};
+
+returnType();
+
+function SeePage(id, value, page) {
+  this.nameItem = requestItem(id, "name");
+  this.timeItem = requestItem(id, "time");
+  this.dateItem = requestItem(id, "date");
+  this.textItem = requestItem(id, "text");
 
   this.page = methods.divCreate("", `page-${value}`);
   this.page.id = "see";
@@ -475,8 +514,8 @@ const choosePage = () => {
   return choose;
 };
 
-const seePage = (id, value) => {
-  const chosen = new SeePage(id, value);
+const seePage = (id, value, page) => {
+  const chosen = new SeePage(id, value, page);
   const myPage = chosen.page;
   const myField = chosen.field;
   return { myPage, myField };
@@ -608,9 +647,14 @@ seeBtn.addEventListener("click", () => {
 
   useLoadAndCheck();
 
-  writeLoader("doing", seePage("0", "see").myPage, src, chooseS);
-  writeLoader("late", seePage("0", "see").myPage, src, chooseS);
-  writeLoader("completed", seePage("0", "see").myPage, src, chooseS);
+  writeLoader("doing", seePage("0", "see", "doing").myPage, src, chooseS);
+  writeLoader("late", seePage("0", "see", "late").myPage, src, chooseS);
+  writeLoader(
+    "completed",
+    seePage("0", "see", "completed").myPage,
+    src,
+    chooseS
+  );
 
   returnBtn(main);
 });
