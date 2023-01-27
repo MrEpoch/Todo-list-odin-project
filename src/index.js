@@ -4,8 +4,6 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
 
-const idArr = [];
-
 const idGet = () => {
   const idCalled = localStorage.getItem("Id");
   return idCalled;
@@ -20,8 +18,10 @@ function localItem(itemObject, id) {
   localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
-let arrWithLocal = [];
-let myMeasure = [];
+const idLocalMeasure = () => {
+  const nowId = localStorage.length - 1;
+  return nowId;
+};
 
 const checkIfId = () => {
   if (!localStorage.getItem("Id")) {
@@ -43,29 +43,7 @@ const requestItem = (id, item) => {
   return requestedItem;
 };
 
-const loadArr = () => {
-  const curId = parseInt(idGet(), 10);
-  if (checkIfId() === true && curId > arrWithLocal.length) {
-    for (let i = 0; i < curId; i += 1) {
-      const localVal = {
-        name: requestItem(i.toString(), "name"),
-        time: requestItem(i.toString(), "time"),
-        date: requestItem(i.toString(), "date"),
-        text: requestItem(i.toString(), "text"),
-      };
-      arrWithLocal.push(localVal);
-    }
-    return arrWithLocal;
-  }
-  return false;
-};
-
-const useLoadAndCheck = () => {
-  checkIfId();
-  loadArr();
-};
-
-useLoadAndCheck();
+checkIfId();
 
 function storageAvailable(type) {
   let storage;
@@ -102,12 +80,6 @@ function NewItem(name, time, date, completed, text) {
   this.text = text;
 }
 
-const itemsCount = () => {
-  const currentId = localStorage.getItem("Id");
-  const IntId = parseInt(currentId, 10) + 1;
-  return IntId;
-};
-
 function LoadH(hType, hValue) {
   const loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
 
@@ -126,87 +98,70 @@ function LoadH(hType, hValue) {
 const lateCheck = () => {
   const dateContainer = [];
   const timeContainer = [];
-  for (let i = 0; i < arrWithLocal.length; i += 1) {
-    if (arrWithLocal[i].date) {
+  const localLength = parseInt(idGet(), 10) - 1;
+  for (let i = 0; i < localLength; i += 1) {
+    const localStor = JSON.parse(localStorage.getItem(i.toString()));
+    if (localStor.date || (localStor.date && localStor.time)) {
       const curDate = new Date();
       const curYear = curDate.getFullYear();
       const curMonth = curDate.getMonth();
       const curDay = curDate.getDay();
       const curHour = curDate.getHours();
       const curMinute = curDate.getMinutes();
-      dateContainer[i] = arrWithLocal[i].date.split("-");
-      timeContainer[i] = arrWithLocal[i].time.split(":");
-      if (dateContainer[i]["0"] >= curYear) {
-        if (
-          dateContainer[i]["1"] >= curMonth &&
-          dateContainer[i]["0"] === curYear
-        ) {
-          if (
-            dateContainer[i]["2"] >= curDay &&
-            dateContainer[i]["1"] === curMonth
-          ) {
-            if (
-              timeContainer[i]["0"] >= curHour &&
-              dateContainer[i]["2"] === curDay
-            ) {
-              if (
-                timeContainer[i]["1"] >= curMinute &&
-                timeContainer[i]["0"] === curHour
-              ) {
-                arrWithLocal[i].late = false;
-              } else {
-                arrWithLocal[i].late = true;
-              }
-              arrWithLocal[i].late = false;
-            } else {
-              arrWithLocal[i].late = true;
-            }
-            arrWithLocal[i].late = false;
-          } else {
-            arrWithLocal[i].late = true;
-          }
-          arrWithLocal[i].late = false;
-        } else {
-          arrWithLocal[i].late = true;
-        }
-        arrWithLocal[i].late = false;
+      dateContainer[i] = localStor.date.split("-");
+      timeContainer[i] = localStor.time.split(":");
+
+      if (dateContainer[i]["0"] > curYear) {
+        localStor.late = false;
+      } else if (
+        dateContainer[i]["1"] > curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        dateContainer[i]["2"] > curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        timeContainer[i]["0"] > curHour &&
+        dateContainer[i]["2"] === curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        timeContainer[i]["1"] >= curMinute &&
+        timeContainer[i]["0"] === curHour &&
+        dateContainer[i]["2"] === curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
       } else {
-        arrWithLocal[i].late = true;
+        localStor.late = true;
       }
     }
-  }
-};
-
-const reLate = () => {
-  for (let i = 0; i < arrWithLocal.length; i += 1) {
-    const value = JSON.parse(localStorage.getItem(i.toString()));
-    value.late = arrWithLocal[i].late;
-    localStorage.setItem(i.toString(), JSON.stringify(value));
+    localStorage.setItem(i.toString(), JSON.stringify(localStor));
   }
 };
 
 lateCheck();
 
-reLate();
-
-console.log(arrWithLocal[0]);
-
 const assignPlace = () => {
   const numOfItems = localStorage.length - 1;
   for (let i = 0; i < numOfItems; i += 1) {
-    const value = JSON.parse(localStorage.getItem(i.toString()));
+    const value = JSON.parse(localStorage.getItem(`${i}`));
     if (value.completed === true) {
-      arrWithLocal[i].place = "completed";
-      value.place = arrWithLocal[i].place;
+      value.place = "completed";
       localStorage.setItem(i.toString(), JSON.stringify(value));
     } else if (value.completed === false) {
       if (value.late === true) {
-        arrWithLocal[i].place = "late";
-        value.place = arrWithLocal[i].place;
+        value.place = "late";
         localStorage.setItem(i.toString(), JSON.stringify(value));
-      } else if (value.late === false) {
-        arrWithLocal[i].place = "doing";
-        value.place = arrWithLocal[i].place;
+      } else {
+        value.place = "doing";
         localStorage.setItem(i.toString(), JSON.stringify(value));
       }
     }
@@ -422,31 +377,6 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-const doingArr = [];
-const lateArr = [];
-const completedArr = [];
-
-const returnType = () => {
-  if (!arrWithLocal.length === 0) {
-    for (let i = 0; i < arrWithLocal.length; i += 1) {
-      if (arrWithLocal[i].place === "doing") {
-        arrWithLocal.typeId = i;
-        doingArr.push(arrWithLocal[i]);
-      }
-      if (arrWithLocal[i].place === "late") {
-        arrWithLocal.typeId = i;
-        lateArr.push(arrWithLocal[i]);
-      }
-      if (arrWithLocal[i].place === "completed") {
-        arrWithLocal.typeId = i;
-        completedArr.push(arrWithLocal[i]);
-      }
-    }
-  }
-};
-
-returnType();
-
 const idSeeCheck = (id, page) => {
   const checkingValue = requestItem(id, "place");
   if (checkingValue === page) {
@@ -566,9 +496,10 @@ const returnBtn = (value) => {
   returnBtns.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(value);
-    useLoadAndCheck();
+    checkIfId();
+    assignPlace();
+    lateCheck();
   });
-
   return returnBtns;
 };
 
@@ -594,7 +525,7 @@ const seeBtnsLogic = (value, id, page) => {
   const prev = checkPage(value).prevBtn;
   let currId = id;
   next.addEventListener("click", () => {
-    useLoadAndCheck();
+    checkIfId();
     if (currId < idGet() - 1) {
       currId += 1;
       field.innerHTML = "";
@@ -608,7 +539,7 @@ const seeBtnsLogic = (value, id, page) => {
     }
   });
   prev.addEventListener("click", () => {
-    useLoadAndCheck();
+    checkIfId();
     if (currId > 0) {
       currId -= 1;
       field.innerHTML = "";
@@ -644,8 +575,9 @@ const writeSubmit = (value) => {
     localItem(Item, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
-    useLoadAndCheck();
+    checkIfId();
     lateCheck();
+    reLate();
     assignPlace();
   });
   return submit;
@@ -674,7 +606,7 @@ addBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(writePage());
 
-  useLoadAndCheck();
+  checkIfId();
 
   writeSubmit(src);
   returnBtn(main);
@@ -684,7 +616,7 @@ seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(chooseS);
 
-  useLoadAndCheck();
+  checkIfId();
 
   writeLoader("doing", seePage("0", "see", "doing").myPage, src, chooseS);
   writeLoader("late", seePage("0", "see", "late").myPage, src, chooseS);

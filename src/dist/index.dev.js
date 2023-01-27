@@ -70,7 +70,6 @@ function _interopRequireWildcard(obj) {
 }
 
 var src = methods.divCreate("", "src");
-var idArr = [];
 
 var idGet = function idGet() {
   var idCalled = localStorage.getItem("Id");
@@ -86,8 +85,10 @@ function localItem(itemObject, id) {
   localStorage.setItem("".concat(id), JSON.stringify(itemObject));
 }
 
-var arrWithLocal = [];
-var myMeasure = [];
+var idLocalMeasure = function idLocalMeasure() {
+  var nowId = localStorage.length - 1;
+  return nowId;
+};
 
 var checkIfId = function checkIfId() {
   if (!localStorage.getItem("Id")) {
@@ -113,32 +114,7 @@ var requestItem = function requestItem(id, item) {
   return requestedItem;
 };
 
-var loadArr = function loadArr() {
-  var curId = parseInt(idGet(), 10);
-
-  if (checkIfId() === true && curId > arrWithLocal.length) {
-    for (var i = 0; i < curId; i += 1) {
-      var localVal = {
-        name: requestItem(i.toString(), "name"),
-        time: requestItem(i.toString(), "time"),
-        date: requestItem(i.toString(), "date"),
-        text: requestItem(i.toString(), "text"),
-      };
-      arrWithLocal.push(localVal);
-    }
-
-    return arrWithLocal;
-  }
-
-  return false;
-};
-
-var useLoadAndCheck = function useLoadAndCheck() {
-  checkIfId();
-  loadArr();
-};
-
-useLoadAndCheck();
+checkIfId();
 
 function storageAvailable(type) {
   var storage;
@@ -171,12 +147,6 @@ function NewItem(name, time, date, completed, text) {
   this.text = text;
 }
 
-var itemsCount = function itemsCount() {
-  var currentId = localStorage.getItem("Id");
-  var IntId = parseInt(currentId, 10) + 1;
-  return IntId;
-};
-
 function LoadH(hType, hValue) {
   var loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
   return loaderH3;
@@ -191,93 +161,75 @@ function LoadH(hType, hValue) {
 var lateCheck = function lateCheck() {
   var dateContainer = [];
   var timeContainer = [];
+  var localLength = parseInt(idGet(), 10) - 1;
 
-  for (var i = 0; i < arrWithLocal.length; i += 1) {
-    if (arrWithLocal[i].date) {
+  for (var i = 0; i < localLength; i += 1) {
+    var localStor = JSON.parse(localStorage.getItem(i.toString()));
+
+    if (localStor.date || (localStor.date && localStor.time)) {
       var curDate = new Date();
       var curYear = curDate.getFullYear();
       var curMonth = curDate.getMonth();
       var curDay = curDate.getDay();
       var curHour = curDate.getHours();
       var curMinute = curDate.getMinutes();
-      dateContainer[i] = arrWithLocal[i].date.split("-");
-      timeContainer[i] = arrWithLocal[i].time.split(":");
+      dateContainer[i] = localStor.date.split("-");
+      timeContainer[i] = localStor.time.split(":");
 
-      if (dateContainer[i]["0"] >= curYear) {
-        if (
-          dateContainer[i]["1"] >= curMonth &&
-          dateContainer[i]["0"] === curYear
-        ) {
-          if (
-            dateContainer[i]["2"] >= curDay &&
-            dateContainer[i]["1"] === curMonth
-          ) {
-            if (
-              timeContainer[i]["0"] >= curHour &&
-              dateContainer[i]["2"] === curDay
-            ) {
-              if (
-                timeContainer[i]["1"] >= curMinute &&
-                timeContainer[i]["0"] === curHour
-              ) {
-                arrWithLocal[i].late = false;
-              } else {
-                arrWithLocal[i].late = true;
-              }
-
-              arrWithLocal[i].late = false;
-            } else {
-              arrWithLocal[i].late = true;
-            }
-
-            arrWithLocal[i].late = false;
-          } else {
-            arrWithLocal[i].late = true;
-          }
-
-          arrWithLocal[i].late = false;
-        } else {
-          arrWithLocal[i].late = true;
-        }
-
-        arrWithLocal[i].late = false;
+      if (dateContainer[i]["0"] > curYear) {
+        localStor.late = false;
+      } else if (
+        dateContainer[i]["1"] > curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        dateContainer[i]["2"] > curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        timeContainer[i]["0"] > curHour &&
+        dateContainer[i]["2"] === curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
+      } else if (
+        timeContainer[i]["1"] >= curMinute &&
+        timeContainer[i]["0"] === curHour &&
+        dateContainer[i]["2"] === curDay &&
+        dateContainer[i]["1"] === curMonth &&
+        dateContainer[i]["0"] === curYear
+      ) {
+        localStor.late = false;
       } else {
-        arrWithLocal[i].late = true;
+        localStor.late = true;
       }
     }
-  }
-};
 
-var reLate = function reLate() {
-  for (var i = 0; i < arrWithLocal.length; i += 1) {
-    var value = JSON.parse(localStorage.getItem(i.toString()));
-    value.late = arrWithLocal[i].late;
-    localStorage.setItem(i.toString(), JSON.stringify(value));
+    localStorage.setItem(i.toString(), JSON.stringify(localStor));
   }
 };
 
 lateCheck();
-reLate();
-console.log(arrWithLocal[0]);
 
 var assignPlace = function assignPlace() {
   var numOfItems = localStorage.length - 1;
 
   for (var i = 0; i < numOfItems; i += 1) {
-    var value = JSON.parse(localStorage.getItem(i.toString()));
+    var value = JSON.parse(localStorage.getItem("".concat(i)));
 
     if (value.completed === true) {
-      arrWithLocal[i].place = "completed";
-      value.place = arrWithLocal[i].place;
+      value.place = "completed";
       localStorage.setItem(i.toString(), JSON.stringify(value));
     } else if (value.completed === false) {
       if (value.late === true) {
-        arrWithLocal[i].place = "late";
-        value.place = arrWithLocal[i].place;
+        value.place = "late";
         localStorage.setItem(i.toString(), JSON.stringify(value));
-      } else if (value.late === false) {
-        arrWithLocal[i].place = "doing";
-        value.place = arrWithLocal[i].place;
+      } else {
+        value.place = "doing";
         localStorage.setItem(i.toString(), JSON.stringify(value));
       }
     }
@@ -497,33 +449,6 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit("".concat(pageName)));
 }
 
-var doingArr = [];
-var lateArr = [];
-var completedArr = [];
-
-var returnType = function returnType() {
-  if (!arrWithLocal.length === 0) {
-    for (var i = 0; i < arrWithLocal.length; i += 1) {
-      if (arrWithLocal[i].place === "doing") {
-        arrWithLocal.typeId = i;
-        doingArr.push(arrWithLocal[i]);
-      }
-
-      if (arrWithLocal[i].place === "late") {
-        arrWithLocal.typeId = i;
-        lateArr.push(arrWithLocal[i]);
-      }
-
-      if (arrWithLocal[i].place === "completed") {
-        arrWithLocal.typeId = i;
-        completedArr.push(arrWithLocal[i]);
-      }
-    }
-  }
-};
-
-returnType();
-
 var idSeeCheck = function idSeeCheck(id, page) {
   var checkingValue = requestItem(id, "place");
 
@@ -635,7 +560,9 @@ var returnBtn = function returnBtn(value) {
   returnBtns.addEventListener("click", function () {
     src.innerHTML = "";
     src.append(value);
-    useLoadAndCheck();
+    checkIfId();
+    assignPlace();
+    lateCheck();
   });
   return returnBtns;
 };
@@ -664,7 +591,7 @@ var seeBtnsLogic = function seeBtnsLogic(value, id, page) {
   var prev = checkPage(value).prevBtn;
   var currId = id;
   next.addEventListener("click", function () {
-    useLoadAndCheck();
+    checkIfId();
 
     if (currId < idGet() - 1) {
       currId += 1;
@@ -681,7 +608,7 @@ var seeBtnsLogic = function seeBtnsLogic(value, id, page) {
     }
   });
   prev.addEventListener("click", function () {
-    useLoadAndCheck();
+    checkIfId();
 
     if (currId > 0) {
       currId -= 1;
@@ -719,8 +646,9 @@ var writeSubmit = function writeSubmit(value) {
     localItem(Item, nowId);
     var changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
-    useLoadAndCheck();
+    checkIfId();
     lateCheck();
+    reLate();
     assignPlace();
   });
   return submit;
@@ -746,14 +674,14 @@ addBtn.addEventListener("click", function () {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
-  useLoadAndCheck();
+  checkIfId();
   writeSubmit(src);
   returnBtn(main);
 });
 seeBtn.addEventListener("click", function () {
   src.innerHTML = "";
   src.append(chooseS);
-  useLoadAndCheck();
+  checkIfId();
   writeLoader("doing", seePage("0", "see", "doing").myPage, src, chooseS);
   writeLoader("late", seePage("0", "see", "late").myPage, src, chooseS);
   writeLoader(
