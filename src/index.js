@@ -18,11 +18,6 @@ function localItem(itemObject, id) {
   localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
-const idLocalMeasure = () => {
-  const nowId = localStorage.length - 1;
-  return nowId;
-};
-
 const checkIfId = () => {
   if (!localStorage.getItem("Id")) {
     localStorage.setItem("Id", "0");
@@ -45,32 +40,6 @@ const requestItem = (id, item) => {
 
 checkIfId();
 
-function storageAvailable(type) {
-  let storage;
-  try {
-    storage = window[type];
-    const x = "__storage_test__";
-    storage.setItem(x, x);
-    storage.removeItem(x);
-    return true;
-  } catch (e) {
-    return (
-      e instanceof DOMException &&
-      // everything except Firefox
-      (e.code === 22 ||
-        // Firefox
-        e.code === 1014 ||
-        // test name field too, because code might not be present
-        // everything except Firefox
-        e.name === "QuotaExceededError" ||
-        // Firefox
-        e.name === "NS_ERROR_DOM_QUOTA_REACHED") &&
-      // acknowledge QuotaExceededError only if there's something already stored
-      storage &&
-      storage.length !== 0
-    );
-  }
-}
 
 function NewItem(name, time, date, completed, text) {
   this.name = name;
@@ -203,19 +172,7 @@ const checkPage = (value) => {
   return { btnLogic, pageBtns, submitBtns, writeBtns, nextBtn, prevBtn };
 };
 
-const myType = (id) => {
-  const myComplete = requestItem(id, "complete");
-  const myLate = requestItem(id, "complete");
 
-  if (myComplete === true) {
-    return "completed";
-  }
-  if (myLate === true) {
-    return "late";
-  }
-
-  return "doing";
-};
 
 //
 
@@ -331,7 +288,7 @@ const TodoText = (pageName) => {
 
   return TodoTextContainer;
 };
-const TodocompletedOr = (pagename) => {
+const TodocompletedOr = () => {
   const TodocompletedContainer = methods.divCreate("", "projDoneContainer");
   const TodocompletedLabel = methods.methodCreate("Label", "completed");
   const TodocompletedInside = methods.inputCreate("", "done", "checkbox");
@@ -476,14 +433,27 @@ const choosePage = () => {
   return choose;
 };
 
+const EleNum = (page) => {
+  const numOfEl = localStorage.length - 1;
+  let myElementNum = 0;
+  for (let i = 0; i < numOfEl; i+=1) {
+    const items = JSON.parse(localStorage.getItem(i.toString()));
+    if (items.place === page) {
+      myElementNum+=1;
+    } 
+  }
+  return myElementNum;
+}
+
 const seePage = (id, value, page) => {
   const chosen = new SeePage(id, value);
-  if (idSeeCheck(id, page) === false) {
-    chosen.name.innerHTML = "empty";
-    chosen.time.innerHTML = "empty";
-    chosen.date.innerHTML = "empty";
-    chosen.text.innerHTML = "empty";
+  if (idSeeCheck(id, page) === false && EleNum() === 0) {
+    chosen.name.textContent = "empty";
+    chosen.time.textContent = "empty";
+    chosen.date.textContent = "empty";
+    chosen.text.textContent = "empty";
   }
+   
   const myPage = chosen.page;
   const myField = chosen.field;
   return { myPage, myField };
@@ -577,7 +547,6 @@ const writeSubmit = (value) => {
     idSet((changeId += 1));
     checkIfId();
     lateCheck();
-    reLate();
     assignPlace();
   });
   return submit;
