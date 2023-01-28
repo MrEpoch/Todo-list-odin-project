@@ -26,6 +26,21 @@ const checkIfId = () => {
   return true;
 };
 
+const deleteItem = (id) => {
+  const idArr = [];
+  for (let i = 0; i < parseInt(idGet(), 10) - 1; i += 1) {
+    idArr.push(JSON.parse(localStorage.getItem(i.toString())));
+    idArr[i].hisId = i;
+  }
+  const newId = parseInt(idGet(), 10) - 1;
+  localStorage.clear();
+  idArr.splice(parseInt(id, 10), 1);
+  for (let i = 0; i < idArr.length; i += 1) {
+    localStorage.setItem(i.toString(), idArr[i]);
+  }
+  localStorage.setItem("Id", newId.toString());
+};
+
 const requestItem = (id, item) => {
   if (!localStorage.getItem(`${id}`)) {
     return "empty";
@@ -53,15 +68,6 @@ function LoadH(hType, hValue) {
 
   return loaderH3;
 }
-
-// if (storageAvailable('localStorage')) {
-//   // Yippee! We can use localStorage awesomeness
-// }
-// else {
-//   // Too bad, no localStorage for us
-// }
-
-// date === 0-Year, 1-month, 2-day
 
 const lateCheck = () => {
   const dateContainer = [];
@@ -149,6 +155,9 @@ const checkPage = (value) => {
   if (currentPage === "main") {
     btnLogic = value.children["0"].children["1"].children["3"];
     writeBtns = value.children["0"].children["1"].children["4"];
+    pageBtns.doingBtns = value.children["0"].children["1"].children["0"];
+    pageBtns.lateBtns = value.children["0"].children["1"].children["1"];
+    pageBtns.completedBtns = value.children["0"].children["1"].children["2"];
   } else if (currentPage === "choose") {
     btnLogic = value.children["0"].children["3"];
     pageBtns.doingBtns = value.children["0"].children["0"].children["0"];
@@ -202,14 +211,14 @@ const cardsInner = {
 
 const content = () => {
   const myContent = methods.divCreate("", "content-cards");
-  function Card(h4Text) {
-    const cardDiv = methods.divCreate(h4Text, "card");
+  function Card(h4Text, type) {
+    const cardDiv = methods.divCreate(h4Text, "card", type);
     return cardDiv;
   }
 
-  const doing = Card(cardsInner.doingH4);
-  const late = Card(cardsInner.lateH4);
-  const completed = Card(cardsInner.completedH4);
+  const doing = Card(cardsInner.doingH4, "doing-card");
+  const late = Card(cardsInner.lateH4, "late-card");
+  const completed = Card(cardsInner.completedH4, "completed-card");
 
   const add = methods.divCreate("", "add-item", "", SvgPict().plusIcon);
   const see = methods.divCreate("", "see-item", "", SvgPict().noteIcon);
@@ -452,10 +461,22 @@ const checkBox = () => {
 const seePage = (id, value, page) => {
   const chosen = new SeePage(id, value);
   if (idSeeCheck(id, page) === false && EleNum(page).length === 0) {
-    chosen.name.textContent = "empty";
-    chosen.time.textContent = "empty";
-    chosen.date.textContent = "empty";
-    chosen.text.textContent = "empty";
+    chosen.name.innerHTML = "";
+    chosen.time.innerHTML = "";
+    chosen.date.innerHTML = "";
+    chosen.text.innerHTML = "";
+    chosen.name.append(
+      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
+    );
+    chosen.time.append(
+      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
+    );
+    chosen.date.append(
+      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
+    );
+    chosen.text.append(
+      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
+    );
   }
 
   const myPage = chosen.page;
@@ -619,6 +640,7 @@ const writeSubmit = (value) => {
     assignPlace();
     fieldCont.removeChild(fieldCont.children[1]);
     fieldCont.insertBefore(form, submitBtn);
+    checkBox();
   });
   return submit;
 };
@@ -637,22 +659,28 @@ const returnBtn = (value) => {
 };
 
 const writeLoader = (btn, page, value, returnPage) => {
-  if (value.children["0"].id === "choose") {
-    let parameter = btn;
-    const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
-    Loadedpage.addEventListener("click", () => {
-      src.innerHTML = "";
-      src.append(page);
-      returnBtn(returnPage);
-      seeBtnsLogic(value, 0, btn);
-    });
-  }
+  let parameter = btn;
+  const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
+  Loadedpage.addEventListener("click", () => {
+    src.innerHTML = "";
+    src.append(page);
+    returnBtn(returnPage);
+    seeBtnsLogic(value, 0, btn);
+  });
 };
 
 src.append(main);
 
 const addBtn = checkPage(src).btnLogic;
 const seeBtn = checkPage(src).writeBtns;
+
+const doingCard = src.children["0"].children["1"].children["0"];
+const lateCard = src.children["0"].children["1"].children["1"];
+const completedCard = src.children["0"].children["1"].children["2"];
+
+doingCard.onpaste = (e) => e.preventDefault();
+lateCard.onpaste = (e) => e.preventDefault();
+completedCard.onpaste = (e) => e.preventDefault();
 
 addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
@@ -663,6 +691,39 @@ addBtn.addEventListener("click", () => {
   writeSubmit(src);
   mainLoader();
   returnBtn(main);
+});
+
+doingCard.addEventListener("click", () => {
+  checkIfId();
+  writeLoader(
+    "doing",
+    seePage(EleNum("doing")["0"], "see", "doing").myPage,
+    src,
+    main
+  );
+  mainLoader();
+});
+
+lateCard.addEventListener("click", () => {
+  checkIfId();
+  writeLoader(
+    "late",
+    seePage(EleNum("late")["0"], "see", "late").myPage,
+    src,
+    main
+  );
+  mainLoader();
+});
+
+completedCard.addEventListener("click", () => {
+  checkIfId();
+  writeLoader(
+    "completed",
+    seePage(EleNum("completed")["0"], "see", "completed").myPage,
+    src,
+    main
+  );
+  mainLoader();
 });
 
 seeBtn.addEventListener("click", () => {
