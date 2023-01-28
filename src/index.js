@@ -40,7 +40,6 @@ const requestItem = (id, item) => {
 
 checkIfId();
 
-
 function NewItem(name, time, date, completed, text) {
   this.name = name;
   this.time = time;
@@ -172,8 +171,6 @@ const checkPage = (value) => {
   return { btnLogic, pageBtns, submitBtns, writeBtns, nextBtn, prevBtn };
 };
 
-
-
 //
 
 const navbar = () => {
@@ -196,6 +193,12 @@ const SvgPict = () => {
 
   const noteIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>note-multiple-outline</title><path d="M3,6V22H21V24H3A2,2 0 0,1 1,22V6H3M16,9H21.5L16,3.5V9M7,2H17L23,8V18A2,2 0 0,1 21,20H7C5.89,20 5,19.1 5,18V4A2,2 0 0,1 7,2M7,4V18H21V11H14V4H7Z"> </path></svg>`;
   return { plusIcon, returnIcon, writeIcon, noteIcon };
+};
+
+const cardsInner = {
+  doingH4: methods.h4Create("Doing", "doing-content"),
+  lateH4: methods.h4Create("Late", "Late-content"),
+  completedH4: methods.h4Create("completed", "completed-content"),
 };
 
 const content = () => {
@@ -435,43 +438,47 @@ const choosePage = () => {
 
 const EleNum = (page) => {
   const numOfEl = localStorage.length - 1;
-  let myElementNum = 0;
-  for (let i = 0; i < numOfEl; i+=1) {
+  const idOfItems = [];
+  for (let i = 0; i < numOfEl; i += 1) {
     const items = JSON.parse(localStorage.getItem(i.toString()));
     if (items.place === page) {
-      myElementNum+=1;
-    } 
+      idOfItems.push(i.toString());
+    }
   }
-  return myElementNum;
-}
+
+  return idOfItems;
+};
+
+// const getRightId = (id, page) => {
+
+// }
+
+// const moveBetweenId = (id, verId, highestVer, firstId) => {
+//   let returnedVal = 0;
+//   if (id < verId) {
+//     returnedVal = id - verId;
+//   } else if(id === highestVer) {
+//     returnedVal = firstId;
+//   }
+
+//   return returnedVal;
+// }
 
 const seePage = (id, value, page) => {
   const chosen = new SeePage(id, value);
-  if (idSeeCheck(id, page) === false && EleNum() === 0) {
+  if (idSeeCheck(id, page) === false && EleNum(page).length === 0) {
     chosen.name.textContent = "empty";
     chosen.time.textContent = "empty";
     chosen.date.textContent = "empty";
     chosen.text.textContent = "empty";
   }
-   
+
   const myPage = chosen.page;
   const myField = chosen.field;
   return { myPage, myField };
 };
 
 //
-
-const returnBtn = (value) => {
-  const returnBtns = checkPage(src).btnLogic;
-  returnBtns.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(value);
-    checkIfId();
-    assignPlace();
-    lateCheck();
-  });
-  return returnBtns;
-};
 
 const errorMess = "Please restart page or contact support!";
 const main = methods.divCreate(
@@ -489,23 +496,83 @@ if (navbar() && content()) {
 }
 const chooseS = choosePage();
 
+const mainLoader = () => {
+  const doing = main.children["1"].children["0"];
+  const late = main.children["1"].children["1"];
+  const completed = main.children["1"].children["2"];
+
+  doing.innerHTML = "";
+  late.innerHTML = "";
+  completed.textContent = "";
+
+  doing.append(cardsInner.doingH4);
+  late.append(cardsInner.lateH4);
+  completed.append(cardsInner.completedH4);
+
+  const DoingArr = EleNum("doing");
+  const LateArr = EleNum("late");
+  const CompletedArr = EleNum("completed");
+  const mainDoingArr = [];
+  const mainLateArr = [];
+  const mainCompletedArr = [];
+  for (let i = 0; i < 5; i += 1) {
+    if (DoingArr.length !== 0 && DoingArr.length > i) {
+      const toPush = JSON.parse(localStorage.getItem(DoingArr[i]));
+      mainDoingArr.push(toPush.name);
+    }
+
+    if (LateArr.length !== 0 && LateArr.length > i) {
+      const toPush = JSON.parse(localStorage.getItem(LateArr[i]));
+      mainLateArr.push(toPush.name);
+    }
+
+    if (CompletedArr.length !== 0 && CompletedArr.length > i) {
+      const toPush = JSON.parse(localStorage.getItem(CompletedArr[i]));
+      mainCompletedArr[mainCompletedArr.length] = toPush.name;
+    }
+
+    //
+
+    if (mainDoingArr[i]) {
+      doing.append(methods.h5Create(mainDoingArr[i], "h4-doing-pageFill"));
+    } else {
+      doing.append(methods.h5Create("empty", "none"));
+    }
+
+    if (mainLateArr[i]) {
+      late.append(methods.h5Create(mainLateArr[i], "h4-late-pageFill"));
+    } else {
+      late.append(methods.h5Create("empty", "none"));
+    }
+
+    if (mainCompletedArr[i]) {
+      completed.append(
+        methods.h5Create(mainCompletedArr[i], "h4-completed-pageFill")
+      );
+    } else {
+      completed.append(methods.h5Create("empty", "none"));
+    }
+  }
+};
+
+mainLoader();
+
 const seeBtnsLogic = (value, id, page) => {
   const field = value.children["0"].children["1"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
   let currId = id;
+  const arrUsable = EleNum(page);
   next.addEventListener("click", () => {
     checkIfId();
-    if (currId < idGet() - 1) {
+    if (currId < arrUsable.length - 1) {
       currId += 1;
       field.innerHTML = "";
-      const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see", page).myField);
-    } else if (currId === idGet() - 1) {
+      field.append(seePage(arrUsable[currId], "see", page).myField);
+    } else if (currId === arrUsable.length - 1) {
       currId = 0;
       field.innerHTML = "";
-      const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see", page).myField);
+      field.append(seePage(arrUsable[currId], "see", page).myField);
     }
   });
   prev.addEventListener("click", () => {
@@ -513,13 +580,11 @@ const seeBtnsLogic = (value, id, page) => {
     if (currId > 0) {
       currId -= 1;
       field.innerHTML = "";
-      const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see", page).myField);
+      field.append(seePage(arrUsable[currId], "see", page).myField);
     } else if (currId === 0) {
-      currId = idGet() - 1;
+      currId = arrUsable.length - 1;
       field.innerHTML = "";
-      const stringNum = currId.toString();
-      field.append(seePage(stringNum, "see", page).myField);
+      field.append(seePage(arrUsable[currId], "see", page).myField);
     }
   });
 };
@@ -541,7 +606,6 @@ const writeSubmit = (value) => {
       completed.checked,
       textA.value
     );
-    console.log(Item);
     localItem(Item, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
@@ -550,6 +614,19 @@ const writeSubmit = (value) => {
     assignPlace();
   });
   return submit;
+};
+
+const returnBtn = (value) => {
+  const returnBtns = checkPage(src).btnLogic;
+  returnBtns.addEventListener("click", () => {
+    src.innerHTML = "";
+    src.append(value);
+    checkIfId();
+    assignPlace();
+    lateCheck();
+    mainLoader();
+  });
+  return returnBtns;
 };
 
 const writeLoader = (btn, page, value, returnPage) => {
@@ -576,8 +653,8 @@ addBtn.addEventListener("click", () => {
   src.append(writePage());
 
   checkIfId();
-
   writeSubmit(src);
+  mainLoader();
   returnBtn(main);
 });
 
@@ -595,7 +672,7 @@ seeBtn.addEventListener("click", () => {
     src,
     chooseS
   );
-
+  mainLoader();
   returnBtn(main);
 });
 
