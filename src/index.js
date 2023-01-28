@@ -347,7 +347,7 @@ function SeePage(id, value) {
   this.page = methods.divCreate("", `page-${value}`);
   this.page.id = "see";
 
-  this.field = methods.fieldsetCreate("", `field-Re`);
+  this.field = methods.fieldsetCreate("", `field-see`);
   this.returnBtn = methods.divCreate(
     "",
     `return-Re`,
@@ -542,7 +542,7 @@ const mainLoader = () => {
 
 mainLoader();
 
-const seeBtnsLogic = (value, id, page, form) => {
+const seeBtnsLogic = (value, id, page) => {
   const field = value.children["0"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
