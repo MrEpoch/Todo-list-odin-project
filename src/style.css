@@ -1,3 +1,9 @@
+/* Mady by MrEpoch */
+
+/* -------- symbolizes end of one thing setting */
+
+/* ======== symbolizes end of some chapter of settings like inputs or buttons */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,7 +12,13 @@
 
 :root {
   --btn-size: 70px;
+  --hover-gray: #cbd5e1;
+  --border-btn: #64748b;
+  --btn-color: #ecfeff;
+  --non-bright-var: #fafafa;
 }
+
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@100;200;300;400;500;600;700;800&display=swap");
 
 @font-face {
   font-family: "Demiths";
@@ -19,8 +31,7 @@ html,
 body {
   height: 100%;
   width: 100%;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-family: "Sora", sans-serif;
 }
 
 .src {
@@ -31,34 +42,11 @@ body {
 .main {
   width: 100%;
   height: 100%;
-  background-image: url("./components/images/background.jpg");
+  background-image: url("./components/images/back-grad.jpg");
   background-size: cover;
   background-position: center;
   display: grid;
   grid-template: 0.5fr 3fr / 1fr;
-}
-
-.see-item {
-  position: absolute;
-  width: var(--btn-size);
-  height: var(--btn-size);
-  right: 10px;
-  right: 35px;
-  top: 250px;
-  background-color: white;
-  border-radius: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.see-item > svg {
-  width: 40px;
-  height: 40px;
-}
-
-.see-item:hover {
-  background-color: rgb(144, 141, 141);
 }
 
 #doing,
@@ -69,14 +57,17 @@ body {
   grid-template-rows: 1fr 3.5fr 1fr;
 }
 
-#write > fieldset {
+#write > .field-write {
   grid-row: 2 / 3;
   width: 40%;
   height: 100%;
   justify-self: center;
   display: grid;
-  grid-template-rows: repeat(3, 1fr) 3fr;
-  background-color: white;
+  grid-template-rows: repeat(3, 1fr) 3fr 1fr;
+  background-color: var(--non-bright-var);
+  border: 2px solid var(--border-btn);
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 .projNameContainer,
@@ -89,6 +80,10 @@ body {
 
 .projNameContainer > label {
   padding-right: 30px;
+}
+
+input {
+  border: 2px solid var(--border-btn);
 }
 
 input[type="text"] {
@@ -107,8 +102,26 @@ input[type="date"] {
 }
 
 .projDoneContainer {
-  position: absolute;
-  top: 350px;
+  display: grid;
+  grid-template-columns: 0.01fr 1fr;
+  align-items: center;
+}
+
+.projDoneContainer > div {
+  border: 2px solid var(--border-btn);
+  height: 15px;
+  width: 15px;
+}
+
+.projDoneContainer > div:hover {
+  background-color: var(--hover-gray);
+}
+
+.done-style {
+  background-image: url("./components/images/check-better.svg");
+  background-position: center;
+  background-size: cover;
+  background-color: rgba(144, 238, 144, 0.677);
 }
 
 .projDoneContainer > label {
@@ -122,6 +135,7 @@ input[type="date"] {
 }
 
 textarea {
+  border: 2px solid var(--border-btn);
   justify-self: center;
   resize: none;
   width: 420px;
@@ -133,58 +147,8 @@ textarea {
   padding-right: 30px;
 }
 
-.page-doing-container {
-  background-image: url("./components/images/doing.jpg");
-  background-position: center;
-  background-size: cover;
-  height: 100%;
-  width: 100%;
-}
-
-#return-text {
-  width: var(--btn-size);
-  height: var(--btn-size);
-  border-radius: 50px;
-  background-color: rgba(255, 255, 255, 0.548);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px;
-}
-
-#return-text:hover {
-  background-color: white;
-}
-
-.submit-btn-container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-#submitBtn {
-  background-color: transparent;
-  border: 3px solid black;
-  border-radius: 10px;
-  width: 120px;
-  height: 40px;
-  align-self: center;
-}
-
-#submitBtn:hover {
-  background-color: grey;
-}
-
 .page-write-container {
-  background-image: url("./components/images/will.jpg");
-  background-position: center;
-  background-size: cover;
-  height: 100%;
-  width: 100%;
-}
-
-.page-completed-container {
-  background-image: url("./components/images/done.jpg");
+  background-image: url("./components/images/creative.jpg");
   background-position: center;
   background-size: cover;
   height: 100%;
@@ -208,12 +172,12 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0.552);
+  background-color: #64748b;
   border-radius: 50px;
 }
 
 .back-choose:hover {
-  background-color: white;
+  background-color: var(--non-bright-var);
   cursor: pointer;
 }
 
@@ -231,7 +195,7 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: white;
+  background-color: var(--non-bright-var);
 }
 
 .item-name,
@@ -283,21 +247,14 @@ textarea {
   grid-template-columns: repeat(3, 1fr);
 }
 
-.navbar > .navbar-div-projects {
+.navbar > div {
   width: 100%;
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   padding-bottom: 15px;
-}
-
-.navbar-div-projects > .navbar-h3-projects {
-  font-family: "Demiths";
-  font-size: 24px;
-  letter-spacing: 0.7px;
-  border-bottom: 2px solid black;
-  border-radius: 5px;
+  height: 50%;
 }
 
 .content-cards {
@@ -308,7 +265,7 @@ textarea {
 }
 
 .card {
-  background-color: white;
+  background-color: rgb(255, 255, 255);
   width: 23%;
   height: 67%;
   padding: 20px;
@@ -336,12 +293,18 @@ textarea {
   font-weight: 400;
 }
 
+/* ================= */
+
+/* Button css settings */
+
+/* add btn */
+
 .add-item {
   position: absolute;
   right: 35px;
   top: 140px;
   background-color: #fafafa;
-  border: 2px solid rgba(215, 205, 205, 0.795);
+  border: 2px solid var(--border-btn);
   width: var(--btn-size);
   height: var(--btn-size);
   border-radius: 50px;
@@ -349,10 +312,12 @@ textarea {
   justify-content: center;
   align-items: center;
   font-family: "Demiths";
+  transition: 0.3s;
 }
 
 .add-item:hover {
-  background-color: #ded8d8;
+  background-color: var(--hover-gray);
+  border: 2px solid black;
   cursor: pointer;
 }
 
@@ -360,3 +325,83 @@ textarea {
   height: 50px;
   width: 50px;
 }
+
+/* -------- */
+
+/* see item btn */
+
+.see-item {
+  position: absolute;
+  width: var(--btn-size);
+  height: var(--btn-size);
+  right: 10px;
+  right: 35px;
+  top: 250px;
+  background-color: var(--non-bright-var);
+  border-radius: 50px;
+  display: flex;
+  border: 2px solid var(--border-btn);
+  justify-content: center;
+  align-items: center;
+  transition: 0.3s;
+}
+
+.see-item > svg {
+  width: 40px;
+  height: 40px;
+}
+
+.see-item:hover {
+  background-color: var(--hover-gray);
+  border: 2px solid black;
+  cursor: pointer;
+}
+
+/* -------- */
+
+/* return buttons settings */
+
+#return-text {
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50px;
+  background-color: var(--btn-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px;
+  border: 2px solid var(--border-btn);
+  transition: 0.1s;
+}
+
+#return-text:hover {
+  border: 3px solid black;
+  background-color: var(--hover-gray);
+}
+
+/* -------- */
+
+/* Submit button settings */
+
+.submit-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#submitBtn {
+  background-color: var(--btn-color);
+  border: 2px solid var(--border-btn);
+  border-radius: 10px;
+  width: 120px;
+  height: 40px;
+  align-self: center;
+  font-family: "Demiths";
+}
+
+#submitBtn:hover {
+  background-color: var(--hover-gray);
+  border: 2px solid black;
+}
+
+/* -------- */

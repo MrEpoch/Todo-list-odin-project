@@ -175,8 +175,7 @@ const checkPage = (value) => {
 
 const navbar = () => {
   const myNavbar = methods.navCreate("", "navbar");
-  const projectsHeader = methods.h3Create("Todo", "navbar-h3-projects");
-  const projectsDiv = methods.divCreate(projectsHeader, "navbar-div-projects");
+  const projectsDiv = methods.divCreate("", "navbar-div-projects");
   myNavbar.append(projectsDiv);
 
   return myNavbar;
@@ -207,12 +206,6 @@ const content = () => {
     const cardDiv = methods.divCreate(h4Text, "card");
     return cardDiv;
   }
-
-  const cardsInner = {
-    doingH4: methods.h4Create("Doing", "doing-content"),
-    lateH4: methods.h4Create("Late", "Late-content"),
-    completedH4: methods.h4Create("completed", "completed-content"),
-  };
 
   const doing = Card(cardsInner.doingH4);
   const late = Card(cardsInner.lateH4);
@@ -294,7 +287,7 @@ const TodoText = (pageName) => {
 const TodocompletedOr = () => {
   const TodocompletedContainer = methods.divCreate("", "projDoneContainer");
   const TodocompletedLabel = methods.methodCreate("Label", "completed");
-  const TodocompletedInside = methods.inputCreate("", "done", "checkbox");
+  const TodocompletedInside = methods.divCreate("", "done");
 
   TodocompletedContainer.append(TodocompletedLabel, TodocompletedInside);
 
@@ -331,8 +324,8 @@ function WritingPages(pageName) {
     TodoName(`${pageName}`),
     TodoTime(`${pageName}`),
     TodoDate(`${pageName}`),
-    TodocompletedOr(`${pageName}`),
-    TodoText(`${pageName}`)
+    TodoText(`${pageName}`),
+    TodocompletedOr(`${pageName}`)
   );
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
@@ -449,20 +442,12 @@ const EleNum = (page) => {
   return idOfItems;
 };
 
-// const getRightId = (id, page) => {
-
-// }
-
-// const moveBetweenId = (id, verId, highestVer, firstId) => {
-//   let returnedVal = 0;
-//   if (id < verId) {
-//     returnedVal = id - verId;
-//   } else if(id === highestVer) {
-//     returnedVal = firstId;
-//   }
-
-//   return returnedVal;
-// }
+const checkBox = () => {
+  const completed = src.children[0].children["1"].children["4"].children["1"];
+  completed.addEventListener("click", () => {
+    completed.classList.toggle("done-style");
+  });
+};
 
 const seePage = (id, value, page) => {
   const chosen = new SeePage(id, value);
@@ -557,8 +542,8 @@ const mainLoader = () => {
 
 mainLoader();
 
-const seeBtnsLogic = (value, id, page) => {
-  const field = value.children["0"].children["1"];
+const seeBtnsLogic = (value, id, page, form) => {
+  const field = value.children["0"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
   let currId = id;
@@ -567,24 +552,36 @@ const seeBtnsLogic = (value, id, page) => {
     checkIfId();
     if (currId < arrUsable.length - 1) {
       currId += 1;
-      field.innerHTML = "";
-      field.append(seePage(arrUsable[currId], "see", page).myField);
+      field.removeChild(field.children["1"]);
+      field.insertBefore(
+        seePage(arrUsable[currId], "see", page).myField,
+        field.children["1"]
+      );
     } else if (currId === arrUsable.length - 1) {
       currId = 0;
-      field.innerHTML = "";
-      field.append(seePage(arrUsable[currId], "see", page).myField);
+      field.removeChild(field.children["1"]);
+      field.insertBefore(
+        seePage(arrUsable[currId], "see", page).myField,
+        field.children["1"]
+      );
     }
   });
   prev.addEventListener("click", () => {
     checkIfId();
     if (currId > 0) {
       currId -= 1;
-      field.innerHTML = "";
-      field.append(seePage(arrUsable[currId], "see", page).myField);
+      field.removeChild(field.children["1"]);
+      field.insertBefore(
+        seePage(arrUsable[currId], "see", page).myField,
+        field.children["1"]
+      );
     } else if (currId === 0) {
       currId = arrUsable.length - 1;
-      field.innerHTML = "";
-      field.append(seePage(arrUsable[currId], "see", page).myField);
+      field.removeChild(field.children["1"]);
+      field.insertBefore(
+        seePage(arrUsable[currId], "see", page).myField,
+        field.children["1"]
+      );
     }
   });
 };
@@ -592,18 +589,26 @@ const seeBtnsLogic = (value, id, page) => {
 const writeSubmit = (value) => {
   const submit = checkPage(src).submitBtns;
   submit.addEventListener("click", () => {
+    const writeP = writePage();
+    const form = writeP.children[1];
     const nowId = idGet();
+    const fieldCont = value.children[0];
+    const submitBtn = value.children[0].children["2"];
     const input = value.children[0].children["1"].children["0"].children["1"];
     const time = value.children[0].children["1"].children["1"].children["1"];
     const date = value.children[0].children["1"].children["2"].children["1"];
+    const textA = value.children[0].children["1"].children["3"].children["0"];
     const completed =
-      value.children[0].children["1"].children["3"].children["1"];
-    const textA = value.children[0].children["1"].children["4"].children["0"];
+      value.children[0].children["1"].children["4"].children["1"];
+    let compVal = false;
+    if (completed.classList.contains("done-style")) {
+      compVal = true;
+    }
     const Item = new NewItem(
       input.value,
       time.value,
       date.value,
-      completed.checked,
+      compVal,
       textA.value
     );
     localItem(Item, nowId);
@@ -612,6 +617,8 @@ const writeSubmit = (value) => {
     checkIfId();
     lateCheck();
     assignPlace();
+    fieldCont.removeChild(fieldCont.children[1]);
+    fieldCont.insertBefore(form, submitBtn);
   });
   return submit;
 };
@@ -651,7 +658,7 @@ addBtn.addEventListener("click", () => {
   addBtn.innerHTML = SvgPict().plusIcon;
   src.innerHTML = "";
   src.append(writePage());
-
+  checkBox();
   checkIfId();
   writeSubmit(src);
   mainLoader();
@@ -664,11 +671,21 @@ seeBtn.addEventListener("click", () => {
 
   checkIfId();
 
-  writeLoader("doing", seePage("0", "see", "doing").myPage, src, chooseS);
-  writeLoader("late", seePage("0", "see", "late").myPage, src, chooseS);
+  writeLoader(
+    "doing",
+    seePage(EleNum("doing")["0"], "see", "doing").myPage,
+    src,
+    chooseS
+  );
+  writeLoader(
+    "late",
+    seePage(EleNum("late")["0"], "see", "late").myPage,
+    src,
+    chooseS
+  );
   writeLoader(
     "completed",
-    seePage("0", "see", "completed").myPage,
+    seePage(EleNum("completed")["0"], "see", "completed").myPage,
     src,
     chooseS
   );
