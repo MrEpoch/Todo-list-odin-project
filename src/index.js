@@ -5,13 +5,13 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 const src = methods.divCreate("", "src");
 
 const valueLoop = (folderArr, value) => {
-  console.log(folderArr);
   for (let i = 0; i < folderArr.length; i += 1) {
     if (folderArr[i] === value) {
       const val = folderArr[i];
       return val;
     }
-    if (value === "Id" && folderArr[i].id) {
+    if (folderArr[i].id) {
+      console.log(folderArr[i].id, "wat");
       const val = folderArr[i].id;
       return val;
     }
@@ -19,23 +19,23 @@ const valueLoop = (folderArr, value) => {
   return false;
 };
 
+const folderGet = (folder) => {
+  const thisFolder = JSON.parse(localStorage.getItem(folder));
+  return thisFolder;
+};
+
 const storageFolder = (folderName) => {
-  const myFolder = [];
-  localStorage.setItem(folderName, JSON.stringify(myFolder));
+  if (!folderGet(folderName)) {
+    const myFolder = [];
+    localStorage.setItem(folderName, JSON.stringify(myFolder));
+  }
 };
 
 storageFolder("init");
 
-const folderGet = (folder) => {
-  const thisFolder = JSON.parse(localStorage.getItem(folder));
-  console.log(thisFolder, "this");
-  return thisFolder;
-};
-
 const idGet = (folder) => {
   const myFolder = folderGet(folder);
   const idCalled = valueLoop(myFolder, "Id");
-  console.log(idCalled);
   return idCalled;
 };
 
@@ -56,13 +56,14 @@ function localItem(itemObject, id, folder) {
 
 const checkIfId = (folder) => {
   const myFolder = folderGet(folder);
+  console.log(myFolder, "repú");
   if (
-    !valueLoop(myFolder, "Id") ||
+    valueLoop(myFolder, "Id") === false ||
     parseInt(valueLoop(myFolder, "Id"), 10) < 0
   ) {
+    console.log("again");
     localStorage.clear();
     myFolder.push({ id: "0" });
-    console.log(myFolder);
     localStorage.setItem(folder, JSON.stringify(myFolder));
     return false;
   }
@@ -72,8 +73,6 @@ const checkIfId = (folder) => {
 checkIfId("init");
 
 idGet("init");
-
-itemSet("init", "Id", "1");
 
 const deleteItem = (id) => {
   if (parseInt(idGet(), 10) !== 0) {
@@ -121,7 +120,7 @@ function LoadH(hType, hValue) {
 const lateCheck = () => {
   const dateContainer = [];
   const timeContainer = [];
-  const localLength = parseInt(idGet(), 10) - 1;
+  const localLength = parseInt(idGet("init"), 10) - 1;
   for (let i = 0; i < localLength; i += 1) {
     const localStor = JSON.parse(localStorage.getItem(i.toString()));
     if (localStor.date || (localStor.date && localStor.time)) {
@@ -679,7 +678,7 @@ const seeBtnsLogic = (value, id, page) => {
     }
   });
   deleter.addEventListener("click", () => {
-    if (parseInt(idGet(), 10) < 0) {
+    if (parseInt(idGet("init"), 10) < 0) {
       const confirms = confirm("Do you really want to delete this note");
       if (confirms) {
         deleteItem(currId);
@@ -698,7 +697,7 @@ const writeSubmit = (value) => {
   submit.addEventListener("click", () => {
     const writeP = writePage();
     const form = writeP.children[1];
-    const nowId = idGet();
+    const nowId = idGet("init");
     const fieldCont = value.children[0];
     const submitBtn = value.children[0].children["2"];
     const input = value.children[0].children["1"].children["0"].children["1"];
@@ -718,9 +717,9 @@ const writeSubmit = (value) => {
       compVal,
       textA.value
     );
-    localItem(Item, nowId);
+    localItem(Item, nowId, "init");
     let changeId = parseInt(nowId, 10);
-    idSet((changeId += 1));
+    itemSet("init", "Id", (changeId += 1));
     checkIfId("init");
     lateCheck();
     assignPlace();
