@@ -4,27 +4,76 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
 
-const idGet = () => {
-  const idCalled = localStorage.getItem("Id");
+const valueLoop = (folderArr, value) => {
+  console.log(folderArr);
+  for (let i = 0; i < folderArr.length; i += 1) {
+    if (folderArr[i] === value) {
+      const val = folderArr[i];
+      return val;
+    }
+    if (value === "Id" && folderArr[i].id) {
+      const val = folderArr[i].id;
+      return val;
+    }
+  }
+  return false;
+};
+
+const storageFolder = (folderName) => {
+  const myFolder = [];
+  localStorage.setItem(folderName, JSON.stringify(myFolder));
+};
+
+storageFolder("init");
+
+const folderGet = (folder) => {
+  const thisFolder = JSON.parse(localStorage.getItem(folder));
+  console.log(thisFolder, "this");
+  return thisFolder;
+};
+
+const idGet = (folder) => {
+  const myFolder = folderGet(folder);
+  const idCalled = valueLoop(myFolder, "Id");
+  console.log(idCalled);
   return idCalled;
 };
 
-const idSet = (value) => {
-  const idChanged = localStorage.setItem("Id", `${value}`);
-  return idChanged;
+const itemSet = (folder, value, increase) => {
+  const myFolder = folderGet(folder);
+  if (value === "Id") {
+    const idItem = valueLoop(myFolder, "Id");
+  }
+
+  localStorage.setItem(folder, JSON.stringify(myFolder));
 };
 
-function localItem(itemObject, id) {
-  localStorage.setItem(`${id}`, JSON.stringify(itemObject));
+function localItem(itemObject, id, folder) {
+  const folderTake = folderGet(folder);
+  folderTake[id] = itemObject;
+  localStorage.setItem(folder, JSON.stringify(folderTake));
 }
 
-const checkIfId = () => {
-  if (!localStorage.getItem("Id")) {
-    localStorage.setItem("Id", "0");
+const checkIfId = (folder) => {
+  const myFolder = folderGet(folder);
+  if (
+    !valueLoop(myFolder, "Id") ||
+    parseInt(valueLoop(myFolder, "Id"), 10) < 0
+  ) {
+    localStorage.clear();
+    myFolder.push({ id: "0" });
+    console.log(myFolder);
+    localStorage.setItem(folder, JSON.stringify(myFolder));
     return false;
   }
   return true;
 };
+
+checkIfId("init");
+
+idGet("init");
+
+itemSet("init", "Id", "1");
 
 const deleteItem = (id) => {
   if (parseInt(idGet(), 10) !== 0) {
@@ -35,9 +84,7 @@ const deleteItem = (id) => {
     }
     const newId = parseInt(idGet(), 10) - 1;
     localStorage.clear();
-    console.log(idArr);
     idArr.splice(parseInt(id, 10), 1);
-    console.log(idArr);
     for (let i = 0; i < idArr.length; i += 1) {
       localStorage.setItem(i.toString(), JSON.stringify(idArr[i]));
     }
@@ -56,8 +103,6 @@ const requestItem = (id, item) => {
   const requestedItem = itemsObject[item];
   return requestedItem;
 };
-
-checkIfId();
 
 function NewItem(name, time, date, completed, text) {
   this.name = name;
@@ -598,7 +643,7 @@ const seeBtnsLogic = (value, id, page) => {
   let currId = id;
   const arrUsable = EleNum(page);
   next.addEventListener("click", () => {
-    checkIfId();
+    checkIfId("init");
     if (currId < arrUsable.length - 1) {
       currId += 1;
       field.removeChild(field.children["1"]);
@@ -616,7 +661,7 @@ const seeBtnsLogic = (value, id, page) => {
     }
   });
   prev.addEventListener("click", () => {
-    checkIfId();
+    checkIfId("init");
     if (currId > 0) {
       currId -= 1;
       field.removeChild(field.children["1"]);
@@ -634,7 +679,7 @@ const seeBtnsLogic = (value, id, page) => {
     }
   });
   deleter.addEventListener("click", () => {
-    if (parseInt(idGet(), 10) !== 0) {
+    if (parseInt(idGet(), 10) < 0) {
       const confirms = confirm("Do you really want to delete this note");
       if (confirms) {
         deleteItem(currId);
@@ -676,7 +721,7 @@ const writeSubmit = (value) => {
     localItem(Item, nowId);
     let changeId = parseInt(nowId, 10);
     idSet((changeId += 1));
-    checkIfId();
+    checkIfId("init");
     lateCheck();
     assignPlace();
     fieldCont.removeChild(fieldCont.children[1]);
@@ -691,7 +736,7 @@ const returnBtn = (value) => {
   returnBtns.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(value);
-    checkIfId();
+    checkIfId("init");
     assignPlace();
     lateCheck();
     mainLoader();
@@ -728,14 +773,14 @@ addBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(writePage());
   checkBox();
-  checkIfId();
+  checkIfId("init");
   writeSubmit(src);
   mainLoader();
   returnBtn(main);
 });
 
 doingCard.addEventListener("click", () => {
-  checkIfId();
+  checkIfId("init");
   writeLoader(
     "doing",
     seePage(EleNum("doing")["0"], "see", "doing").myPage,
@@ -746,7 +791,7 @@ doingCard.addEventListener("click", () => {
 });
 
 lateCard.addEventListener("click", () => {
-  checkIfId();
+  checkIfId("init");
   writeLoader(
     "late",
     seePage(EleNum("late")["0"], "see", "late").myPage,
@@ -757,7 +802,7 @@ lateCard.addEventListener("click", () => {
 });
 
 completedCard.addEventListener("click", () => {
-  checkIfId();
+  checkIfId("init");
   writeLoader(
     "completed",
     seePage(EleNum("completed")["0"], "see", "completed").myPage,
@@ -771,7 +816,7 @@ seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(chooseS);
 
-  checkIfId();
+  checkIfId("init");
 
   writeLoader(
     "doing",
