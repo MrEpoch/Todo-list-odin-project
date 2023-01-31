@@ -11,9 +11,8 @@ const valueLoop = (folderArr, value) => {
       return val;
     }
     if (folderArr[i].id) {
-      console.log(folderArr[i].id, "wat");
-      const val = folderArr[i].id;
-      return val;
+      const val = folderArr[i];
+      return { val, i };
     }
   }
   return false;
@@ -35,7 +34,7 @@ storageFolder("init");
 
 const idGet = (folder) => {
   const myFolder = folderGet(folder);
-  const idCalled = valueLoop(myFolder, "Id");
+  const idCalled = valueLoop(myFolder, "Id").val.id;
   return idCalled;
 };
 
@@ -43,8 +42,10 @@ const itemSet = (folder, value, increase) => {
   const myFolder = folderGet(folder);
   if (value === "Id") {
     const idItem = valueLoop(myFolder, "Id");
+    const newId = increase;
+    myFolder[valueLoop(myFolder, "Id").i].id = newId.toString();
   }
-
+  localStorage.clear();
   localStorage.setItem(folder, JSON.stringify(myFolder));
 };
 
@@ -58,8 +59,8 @@ const checkIfId = (folder) => {
   const myFolder = folderGet(folder);
   console.log(myFolder, "repú");
   if (
-    valueLoop(myFolder, "Id") === false ||
-    parseInt(valueLoop(myFolder, "Id"), 10) < 0
+    !valueLoop(myFolder, "Id").val ||
+    parseInt(valueLoop(myFolder, "Id").val.id, 10) < 0
   ) {
     console.log("again");
     localStorage.clear();
@@ -174,7 +175,8 @@ lateCheck();
 const assignPlace = () => {
   const numOfItems = localStorage.length - 1;
   for (let i = 0; i < numOfItems; i += 1) {
-    const value = JSON.parse(localStorage.getItem(`${i}`));
+    const folder = folderGet("init");
+    const value = folder[i];
     if (value.completed === true) {
       value.place = "completed";
       localStorage.setItem(i.toString(), JSON.stringify(value));
