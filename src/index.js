@@ -6,7 +6,6 @@ const src = methods.divCreate("", "src");
 
 const valueLoop = (folderArr, value) => {
   for (let i = 0; i < folderArr.length; i += 1) {
-    console.log(folderArr);
     if (folderArr[i].id) {
       const val = folderArr[i];
       return { val, i };
@@ -31,14 +30,13 @@ storageFolder("init");
 
 const idGet = (folder) => {
   const myFolder = folderGet(folder);
-  const idCalled = valueLoop(myFolder, "Id").val.id;
+  const idCalled = myFolder.length;
   return idCalled;
 };
 
 const itemSet = (folder, value, increase) => {
   const myFolder = folderGet(folder);
   if (value === "Id") {
-    const idItem = valueLoop(myFolder, "Id");
     const newId = increase;
     myFolder[valueLoop(myFolder, "Id").i].id = newId.toString();
   }
@@ -58,7 +56,6 @@ const checkIfId = (folder) => {
     !valueLoop(myFolder, "Id").val ||
     parseInt(valueLoop(myFolder, "Id").val.id, 10) < 0
   ) {
-    console.log("again");
     localStorage.clear();
     myFolder.push({ id: "0" });
     localStorage.setItem(folder, JSON.stringify(myFolder));
@@ -117,7 +114,7 @@ function LoadH(hType, hValue) {
 const lateCheck = (folder) => {
   const dateContainer = [];
   const timeContainer = [];
-  const localLength = parseInt(idGet("init"), 10) - 1;
+  const localLength = idGet("init");
   const folderItem = folderGet(folder);
   for (let i = 0; i < localLength; i += 1) {
     const localStor = folderItem[i];
@@ -165,32 +162,30 @@ const lateCheck = (folder) => {
     }
     folderItem[i] = localStor;
   }
+  localStorage.clear();
   localStorage.setItem(folder, JSON.stringify(folderItem));
 };
 
 lateCheck("init");
 
-const assignPlace = () => {
-  const numOfItems = localStorage.length - 1;
+const assignPlace = (folder) => {
+  const numOfItems = idGet("init");
+  const myFolder = folderGet("init");
   for (let i = 0; i < numOfItems; i += 1) {
-    const folder = folderGet("init");
-    const value = folder[i];
-    if (value.completed === true) {
-      value.place = "completed";
-      localStorage.setItem(i.toString(), JSON.stringify(value));
-    } else if (value.completed === false) {
-      if (value.late === true) {
-        value.place = "late";
-        localStorage.setItem(i.toString(), JSON.stringify(value));
+    if (myFolder[i].completed === true) {
+      myFolder[i].place = "completed";
+    } else if (myFolder[i].completed === false) {
+      if (myFolder[i].late === true) {
+        myFolder[i].place = "late";
       } else {
-        value.place = "doing";
-        localStorage.setItem(i.toString(), JSON.stringify(value));
+        myFolder[i].place = "doing";
       }
     }
   }
+  localStorage.setItem(folder, JSON.stringify(myFolder));
 };
 
-assignPlace();
+assignPlace("init");
 
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
@@ -510,9 +505,9 @@ const choosePage = () => {
 };
 
 const EleNum = (page, folder) => {
-  const numOfEl = localStorage.length - 1;
+  const numOfEl = idGet("init");
   const idOfItems = [];
-  const folderItem = JSON.parse(localStorage.getItem(folder));
+  const folderItem = folderGet(folder);
   for (let i = 0; i < numOfEl; i += 1) {
     const items = folderItem[i];
     if (items.place === page) {
@@ -574,11 +569,10 @@ if (navbar() && content()) {
 }
 const chooseS = choosePage();
 
-const mainLoader = () => {
+const mainLoader = (folder) => {
   const doing = main.children["1"].children["0"];
   const late = main.children["1"].children["1"];
   const completed = main.children["1"].children["2"];
-
   doing.innerHTML = "";
   late.innerHTML = "";
   completed.textContent = "";
@@ -593,25 +587,30 @@ const mainLoader = () => {
   const mainDoingArr = [];
   const mainLateArr = [];
   const mainCompletedArr = [];
+  const myFolder = JSON.parse(localStorage.getItem(folder));
   for (let i = 0; i < 5; i += 1) {
     if (DoingArr.length !== 0 && DoingArr.length > i) {
-      const toPush = JSON.parse(localStorage.getItem(DoingArr[i]));
+      const toPush = myFolder[DoingArr[i]];
       mainDoingArr.push(toPush.name);
+      console.log(mainDoingArr.length);
     }
 
     if (LateArr.length !== 0 && LateArr.length > i) {
-      const toPush = JSON.parse(localStorage.getItem(LateArr[i]));
+      const toPush = myFolder[LateArr[i]];
+      console.log(toPush);
       mainLateArr.push(toPush.name);
     }
 
     if (CompletedArr.length !== 0 && CompletedArr.length > i) {
-      const toPush = JSON.parse(localStorage.getItem(CompletedArr[i]));
-      mainCompletedArr[mainCompletedArr.length] = toPush.name;
+      const toPush = myFolder[CompletedArr[i]];
+      console.log(toPush);
+      mainCompletedArr.push(toPush.name);
     }
 
     //
 
     if (mainDoingArr[i]) {
+      console.log("here");
       doing.append(methods.h5Create(mainDoingArr[i], "h4-doing-pageFill"));
     } else {
       doing.append(methods.h5Create("empty", "none"));
@@ -633,7 +632,7 @@ const mainLoader = () => {
   }
 };
 
-mainLoader();
+mainLoader("init");
 
 const seeBtnsLogic = (value, id, page) => {
   const field = value.children["0"];
@@ -719,11 +718,10 @@ const writeSubmit = (value) => {
       textA.value
     );
     localItem(Item, nowId, "init");
-    let changeId = parseInt(nowId, 10);
-    itemSet("init", "Id", (changeId += 1));
+    itemSet("init", "Id", parseInt(nowId, 10));
     checkIfId("init");
     lateCheck("init");
-    assignPlace();
+    assignPlace("init");
     fieldCont.removeChild(fieldCont.children[1]);
     fieldCont.insertBefore(form, submitBtn);
     checkBox();
@@ -737,9 +735,9 @@ const returnBtn = (value) => {
     src.innerHTML = "";
     src.append(value);
     checkIfId("init");
-    assignPlace();
+    assignPlace("init");
     lateCheck("init");
-    mainLoader();
+    mainLoader("init");
   });
   return returnBtns;
 };
@@ -775,7 +773,7 @@ addBtn.addEventListener("click", () => {
   checkBox();
   checkIfId("init");
   writeSubmit(src);
-  mainLoader();
+  mainLoader("init");
   returnBtn(main);
 });
 
@@ -787,7 +785,7 @@ doingCard.addEventListener("click", () => {
     src,
     main
   );
-  mainLoader();
+  mainLoader("init");
 });
 
 lateCard.addEventListener("click", () => {
@@ -798,7 +796,7 @@ lateCard.addEventListener("click", () => {
     src,
     main
   );
-  mainLoader();
+  mainLoader("init");
 });
 
 completedCard.addEventListener("click", () => {
@@ -809,7 +807,7 @@ completedCard.addEventListener("click", () => {
     src,
     main
   );
-  mainLoader();
+  mainLoader("init");
 });
 
 seeBtn.addEventListener("click", () => {
@@ -836,7 +834,7 @@ seeBtn.addEventListener("click", () => {
     src,
     chooseS
   );
-  mainLoader();
+  mainLoader("init");
   returnBtn(main);
 });
 
