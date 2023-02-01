@@ -6,10 +6,7 @@ const src = methods.divCreate("", "src");
 
 const valueLoop = (folderArr, value) => {
   for (let i = 0; i < folderArr.length; i += 1) {
-    if (folderArr[i] === value) {
-      const val = folderArr[i];
-      return val;
-    }
+    console.log(folderArr);
     if (folderArr[i].id) {
       const val = folderArr[i];
       return { val, i };
@@ -57,7 +54,6 @@ function localItem(itemObject, id, folder) {
 
 const checkIfId = (folder) => {
   const myFolder = folderGet(folder);
-  console.log(myFolder, "repú");
   if (
     !valueLoop(myFolder, "Id").val ||
     parseInt(valueLoop(myFolder, "Id").val.id, 10) < 0
@@ -118,12 +114,13 @@ function LoadH(hType, hValue) {
   return loaderH3;
 }
 
-const lateCheck = () => {
+const lateCheck = (folder) => {
   const dateContainer = [];
   const timeContainer = [];
   const localLength = parseInt(idGet("init"), 10) - 1;
+  const folderItem = folderGet(folder);
   for (let i = 0; i < localLength; i += 1) {
-    const localStor = JSON.parse(localStorage.getItem(i.toString()));
+    const localStor = folderItem[i];
     if (localStor.date || (localStor.date && localStor.time)) {
       const curDate = new Date();
       const curYear = curDate.getFullYear();
@@ -166,11 +163,12 @@ const lateCheck = () => {
         localStor.late = true;
       }
     }
-    localStorage.setItem(i.toString(), JSON.stringify(localStor));
+    folderItem[i] = localStor;
   }
+  localStorage.setItem(folder, JSON.stringify(folderItem));
 };
 
-lateCheck();
+lateCheck("init");
 
 const assignPlace = () => {
   const numOfItems = localStorage.length - 1;
@@ -511,11 +509,12 @@ const choosePage = () => {
   return choose;
 };
 
-const EleNum = (page) => {
+const EleNum = (page, folder) => {
   const numOfEl = localStorage.length - 1;
   const idOfItems = [];
+  const folderItem = JSON.parse(localStorage.getItem(folder));
   for (let i = 0; i < numOfEl; i += 1) {
-    const items = JSON.parse(localStorage.getItem(i.toString()));
+    const items = folderItem[i];
     if (items.place === page) {
       idOfItems.push(i.toString());
     }
@@ -533,7 +532,7 @@ const checkBox = () => {
 
 const seePage = (id, value, page) => {
   const chosen = new SeePage(id, value);
-  if (idSeeCheck(id, page) === false && EleNum(page).length === 0) {
+  if (idSeeCheck(id, page) === false && EleNum(page, "init").length === 0) {
     chosen.name.innerHTML = "";
     chosen.time.innerHTML = "";
     chosen.date.innerHTML = "";
@@ -588,9 +587,9 @@ const mainLoader = () => {
   late.append(cardsInner.lateH4);
   completed.append(cardsInner.completedH4);
 
-  const DoingArr = EleNum("doing");
-  const LateArr = EleNum("late");
-  const CompletedArr = EleNum("completed");
+  const DoingArr = EleNum("doing", "init");
+  const LateArr = EleNum("late", "init");
+  const CompletedArr = EleNum("completed", "init");
   const mainDoingArr = [];
   const mainLateArr = [];
   const mainCompletedArr = [];
@@ -642,7 +641,7 @@ const seeBtnsLogic = (value, id, page) => {
   const prev = checkPage(value).prevBtn;
   const deleter = checkPage(value).deleteBtn;
   let currId = id;
-  const arrUsable = EleNum(page);
+  const arrUsable = EleNum(page, "init");
   next.addEventListener("click", () => {
     checkIfId("init");
     if (currId < arrUsable.length - 1) {
@@ -723,7 +722,7 @@ const writeSubmit = (value) => {
     let changeId = parseInt(nowId, 10);
     itemSet("init", "Id", (changeId += 1));
     checkIfId("init");
-    lateCheck();
+    lateCheck("init");
     assignPlace();
     fieldCont.removeChild(fieldCont.children[1]);
     fieldCont.insertBefore(form, submitBtn);
@@ -739,7 +738,7 @@ const returnBtn = (value) => {
     src.append(value);
     checkIfId("init");
     assignPlace();
-    lateCheck();
+    lateCheck("init");
     mainLoader();
   });
   return returnBtns;
@@ -784,7 +783,7 @@ doingCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "doing",
-    seePage(EleNum("doing")["0"], "see", "doing").myPage,
+    seePage(EleNum("doing", "init")["0"], "see", "doing").myPage,
     src,
     main
   );
@@ -795,7 +794,7 @@ lateCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "late",
-    seePage(EleNum("late")["0"], "see", "late").myPage,
+    seePage(EleNum("late", "init")["0"], "see", "late").myPage,
     src,
     main
   );
@@ -806,7 +805,7 @@ completedCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "completed",
-    seePage(EleNum("completed")["0"], "see", "completed").myPage,
+    seePage(EleNum("completed", "init")["0"], "see", "completed").myPage,
     src,
     main
   );
@@ -821,19 +820,19 @@ seeBtn.addEventListener("click", () => {
 
   writeLoader(
     "doing",
-    seePage(EleNum("doing")["0"], "see", "doing").myPage,
+    seePage(EleNum("doing", "init")["0"], "see", "doing").myPage,
     src,
     chooseS
   );
   writeLoader(
     "late",
-    seePage(EleNum("late")["0"], "see", "late").myPage,
+    seePage(EleNum("late", "init")["0"], "see", "late").myPage,
     src,
     chooseS
   );
   writeLoader(
     "completed",
-    seePage(EleNum("completed")["0"], "see", "completed").myPage,
+    seePage(EleNum("completed", "init")["0"], "see", "completed").myPage,
     src,
     chooseS
   );
