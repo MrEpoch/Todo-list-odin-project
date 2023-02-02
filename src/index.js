@@ -68,16 +68,12 @@ checkIfId("init");
 
 idGet("init");
 
-const deleteItem = (id) => {
-  if (parseInt(idGet(), 10) !== 0) {
-    const idArr = [];
-    for (let i = 0; i < parseInt(idGet(), 10); i += 1) {
-      idArr.push(JSON.parse(localStorage.getItem(i.toString())));
-      idArr[i].hisId = i;
-    }
+const deleteItem = (id, folder) => {
+  const myFolder = JSON.parse(localStorage.getItem(folder));
+  if (parseInt(idGet(), 10) > 1) {
     const newId = parseInt(idGet(), 10) - 1;
     localStorage.clear();
-    idArr.splice(parseInt(id, 10), 1);
+    myFolder.splice(parseInt(id, 10), 1);
     for (let i = 0; i < idArr.length; i += 1) {
       localStorage.setItem(i.toString(), JSON.stringify(idArr[i]));
     }
@@ -85,15 +81,15 @@ const deleteItem = (id) => {
   }
 };
 
-const requestItem = (id, item) => {
-  if (!localStorage.getItem(`${id}`)) {
-    return "empty";
+const requestItem = (ids, item, folder) => {
+  const myFolder = folderGet(folder);
+  if (!myFolder[ids].id) {
+    if (!myFolder[ids] || !myFolder[ids][item]) {
+      return "empty";
+    }
   }
-  const itemsObject = JSON.parse(localStorage.getItem(`${id}`));
-  if (!itemsObject[item]) {
-    return "empty";
-  }
-  const requestedItem = itemsObject[item];
+
+  const requestedItem = myFolder[ids][item];
   return requestedItem;
 };
 
@@ -395,19 +391,19 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-const idSeeCheck = (id, page) => {
-  const checkingValue = requestItem(id, "place");
+const idSeeCheck = (id, page, folder) => {
+  const checkingValue = requestItem(id, "place", folder);
   if (checkingValue === page) {
     return true;
   }
   return false;
 };
 
-function SeePage(id, value) {
-  this.nameItem = requestItem(id, "name");
-  this.timeItem = requestItem(id, "time");
-  this.dateItem = requestItem(id, "date");
-  this.textItem = requestItem(id, "text");
+function SeePage(id, value, folder) {
+  this.nameItem = requestItem(id, "name", folder);
+  this.timeItem = requestItem(id, "time", folder);
+  this.dateItem = requestItem(id, "date", folder);
+  this.textItem = requestItem(id, "text", folder);
 
   this.page = methods.divCreate("", `page-${value}`);
   this.page.id = "see";
@@ -514,7 +510,11 @@ const EleNum = (page, folder) => {
       idOfItems.push(i.toString());
     }
   }
-
+  if (idOfItems.length === 0) {
+  }
+  if (idOfItems.length === 0) {
+    idOfItems.push(0);
+  }
   return idOfItems;
 };
 
@@ -525,9 +525,12 @@ const checkBox = () => {
   });
 };
 
-const seePage = (id, value, page) => {
-  const chosen = new SeePage(id, value);
-  if (idSeeCheck(id, page) === false && EleNum(page, "init").length === 0) {
+const seePage = (id, value, page, folder) => {
+  const chosen = new SeePage(id, value, folder);
+  if (
+    idSeeCheck(id, page, folder) === false &&
+    EleNum(page, "init").length === 0
+  ) {
     chosen.name.innerHTML = "";
     chosen.time.innerHTML = "";
     chosen.date.innerHTML = "";
@@ -592,25 +595,21 @@ const mainLoader = (folder) => {
     if (DoingArr.length !== 0 && DoingArr.length > i) {
       const toPush = myFolder[DoingArr[i]];
       mainDoingArr.push(toPush.name);
-      console.log(mainDoingArr.length);
     }
 
     if (LateArr.length !== 0 && LateArr.length > i) {
       const toPush = myFolder[LateArr[i]];
-      console.log(toPush);
       mainLateArr.push(toPush.name);
     }
 
     if (CompletedArr.length !== 0 && CompletedArr.length > i) {
       const toPush = myFolder[CompletedArr[i]];
-      console.log(toPush);
       mainCompletedArr.push(toPush.name);
     }
 
     //
 
     if (mainDoingArr[i]) {
-      console.log("here");
       doing.append(methods.h5Create(mainDoingArr[i], "h4-doing-pageFill"));
     } else {
       doing.append(methods.h5Create("empty", "none"));
@@ -634,7 +633,7 @@ const mainLoader = (folder) => {
 
 mainLoader("init");
 
-const seeBtnsLogic = (value, id, page) => {
+const seeBtnsLogic = (value, id, page, folder) => {
   const field = value.children["0"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
@@ -647,14 +646,14 @@ const seeBtnsLogic = (value, id, page) => {
       currId += 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page).myField,
+        seePage(arrUsable[currId], "see", page, folder).myField,
         field.children["1"]
       );
     } else if (currId === arrUsable.length - 1) {
       currId = 0;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page).myField,
+        seePage(arrUsable[currId], "see", page, folder).myField,
         field.children["1"]
       );
     }
@@ -665,14 +664,14 @@ const seeBtnsLogic = (value, id, page) => {
       currId -= 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page).myField,
+        seePage(arrUsable[currId], "see", page, folder).myField,
         field.children["1"]
       );
     } else if (currId === 0) {
       currId = arrUsable.length - 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page).myField,
+        seePage(arrUsable[currId], "see", page, folder).myField,
         field.children["1"]
       );
     }
@@ -684,7 +683,7 @@ const seeBtnsLogic = (value, id, page) => {
         deleteItem(currId);
         field.removeChild(field.children["1"]);
         field.insertBefore(
-          seePage(arrUsable[currId], "see", page).myField,
+          seePage(arrUsable[currId], "see", page, folder).myField,
           field.children["1"]
         );
       }
@@ -742,14 +741,15 @@ const returnBtn = (value) => {
   return returnBtns;
 };
 
-const writeLoader = (btn, page, value, returnPage) => {
+const writeLoader = (btn, page, value, returnPage, folder) => {
   let parameter = btn;
+  console.l;
   const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
   Loadedpage.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(page);
     returnBtn(returnPage);
-    seeBtnsLogic(value, 0, btn);
+    seeBtnsLogic(value, 0, btn, folder);
   });
 };
 
@@ -781,9 +781,10 @@ doingCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing").myPage,
+    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
     src,
-    main
+    main,
+    "init"
   );
   mainLoader("init");
 });
@@ -792,9 +793,10 @@ lateCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "late",
-    seePage(EleNum("late", "init")["0"], "see", "late").myPage,
+    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
     src,
-    main
+    main,
+    "init"
   );
   mainLoader("init");
 });
@@ -803,9 +805,11 @@ completedCard.addEventListener("click", () => {
   checkIfId("init");
   writeLoader(
     "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed").myPage,
+    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
+      .myPage,
     src,
-    main
+    main,
+    "init"
   );
   mainLoader("init");
 });
@@ -818,21 +822,25 @@ seeBtn.addEventListener("click", () => {
 
   writeLoader(
     "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing").myPage,
+    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
     src,
-    chooseS
+    chooseS,
+    "init"
   );
   writeLoader(
     "late",
-    seePage(EleNum("late", "init")["0"], "see", "late").myPage,
+    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
     src,
-    chooseS
+    chooseS,
+    "init"
   );
   writeLoader(
     "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed").myPage,
+    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
+      .myPage,
     src,
-    chooseS
+    chooseS,
+    "init"
   );
   mainLoader("init");
   returnBtn(main);
