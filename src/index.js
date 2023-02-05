@@ -73,11 +73,9 @@ const deleteItem = (id, folder) => {
   if (parseInt(idGet(), 10) > 1) {
     const newId = parseInt(idGet(), 10) - 1;
     localStorage.clear();
+    const folderLength = parseInt(idGet(), 10);
     myFolder.splice(parseInt(id, 10), 1);
-    for (let i = 0; i < idArr.length; i += 1) {
-      localStorage.setItem(i.toString(), JSON.stringify(idArr[i]));
-    }
-    localStorage.setItem("Id", newId.toString());
+    localStorage.setItem(folder, JSON.stringify(myFolder));
   }
 };
 
@@ -680,7 +678,7 @@ const seeBtnsLogic = (value, id, page, folder) => {
     if (parseInt(idGet("init"), 10) < 0) {
       const confirms = confirm("Do you really want to delete this note");
       if (confirms) {
-        deleteItem(currId);
+        deleteItem(currId, "init");
         field.removeChild(field.children["1"]);
         field.insertBefore(
           seePage(arrUsable[currId], "see", page, folder).myField,
