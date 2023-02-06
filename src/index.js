@@ -4,92 +4,60 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
 
-const valueLoop = (folderArr, value) => {
-  for (let i = 0; i < folderArr.length; i += 1) {
-    if (folderArr[i].id) {
-      const val = folderArr[i];
-      return { val, i };
-    }
-  }
-  return false;
-};
-
-const folderGet = (folder) => {
-  const thisFolder = JSON.parse(localStorage.getItem(folder));
-  return thisFolder;
-};
-
-const storageFolder = (folderName) => {
-  if (!folderGet(folderName)) {
-    const myFolder = [];
-    localStorage.setItem(folderName, JSON.stringify(myFolder));
-  }
-};
-
-storageFolder("init");
-
-const idGet = (folder) => {
-  const myFolder = folderGet(folder);
-  const idCalled = myFolder.length;
+const idGet = () => {
+  const idCalled = localStorage.getItem("Id");
   return idCalled;
 };
 
-const itemSet = (folder, value, increase) => {
-  const myFolder = folderGet(folder);
-  if (value === "Id") {
-    const newId = increase;
-    myFolder[valueLoop(myFolder, "Id").i].id = newId.toString();
-  }
-  localStorage.clear();
-  localStorage.setItem(folder, JSON.stringify(myFolder));
+const idSet = (value) => {
+  const idChanged = localStorage.setItem("Id", `${value}`);
+  return idChanged;
 };
 
-function localItem(itemObject, id, folder) {
-  const folderTake = folderGet(folder);
-  folderTake[id] = itemObject;
-  localStorage.setItem(folder, JSON.stringify(folderTake));
+function localItem(itemObject, id) {
+  localStorage.setItem(`${id}`, JSON.stringify(itemObject));
 }
 
-const checkIfId = (folder) => {
-  const myFolder = folderGet(folder);
-  if (
-    !valueLoop(myFolder, "Id").val ||
-    parseInt(valueLoop(myFolder, "Id").val.id, 10) < 0
-  ) {
-    localStorage.clear();
-    myFolder.push({ id: "0" });
-    localStorage.setItem(folder, JSON.stringify(myFolder));
+const checkIfId = () => {
+  if (!localStorage.getItem("Id")) {
+    localStorage.setItem("Id", "0");
     return false;
   }
   return true;
 };
 
-checkIfId("init");
-
-idGet("init");
-
-const deleteItem = (id, folder) => {
-  const myFolder = JSON.parse(localStorage.getItem(folder));
-  if (parseInt(idGet(), 10) > 1) {
+const deleteItem = (id) => {
+  if (parseInt(idGet(), 10) !== 0) {
+    const idArr = [];
+    for (let i = 0; i < parseInt(idGet(), 10); i += 1) {
+      idArr.push(JSON.parse(localStorage.getItem(i.toString())));
+      idArr[i].hisId = i;
+    }
     const newId = parseInt(idGet(), 10) - 1;
     localStorage.clear();
-    const folderLength = parseInt(idGet(), 10);
-    myFolder.splice(parseInt(id, 10), 1);
-    localStorage.setItem(folder, JSON.stringify(myFolder));
+    console.log(idArr);
+    idArr.splice(parseInt(id, 10), 1);
+    console.log(idArr);
+    for (let i = 0; i < idArr.length; i += 1) {
+      localStorage.setItem(i.toString(), JSON.stringify(idArr[i]));
+    }
+    localStorage.setItem("Id", newId.toString());
   }
 };
 
-const requestItem = (ids, item, folder) => {
-  const myFolder = folderGet(folder);
-  if (!myFolder[ids].id) {
-    if (!myFolder[ids] || !myFolder[ids][item]) {
-      return "empty";
-    }
+const requestItem = (id, item) => {
+  if (!localStorage.getItem(`${id}`)) {
+    return "empty";
   }
-
-  const requestedItem = myFolder[ids][item];
+  const itemsObject = JSON.parse(localStorage.getItem(`${id}`));
+  if (!itemsObject[item]) {
+    return "empty";
+  }
+  const requestedItem = itemsObject[item];
   return requestedItem;
 };
+
+checkIfId();
 
 function NewItem(name, time, date, completed, text) {
   this.name = name;
@@ -105,13 +73,12 @@ function LoadH(hType, hValue) {
   return loaderH3;
 }
 
-const lateCheck = (folder) => {
+const lateCheck = () => {
   const dateContainer = [];
   const timeContainer = [];
-  const localLength = idGet("init");
-  const folderItem = folderGet(folder);
+  const localLength = parseInt(idGet(), 10) - 1;
   for (let i = 0; i < localLength; i += 1) {
-    const localStor = folderItem[i];
+    const localStor = JSON.parse(localStorage.getItem(i.toString()));
     if (localStor.date || (localStor.date && localStor.time)) {
       const curDate = new Date();
       const curYear = curDate.getFullYear();
@@ -121,7 +88,6 @@ const lateCheck = (folder) => {
       const curMinute = curDate.getMinutes();
       dateContainer[i] = localStor.date.split("-");
       timeContainer[i] = localStor.time.split(":");
-
       if (dateContainer[i]["0"] > curYear) {
         localStor.late = false;
       } else if (
@@ -154,32 +120,32 @@ const lateCheck = (folder) => {
         localStor.late = true;
       }
     }
-    folderItem[i] = localStor;
+    localStorage.setItem(i.toString(), JSON.stringify(localStor));
   }
-  localStorage.clear();
-  localStorage.setItem(folder, JSON.stringify(folderItem));
 };
 
-lateCheck("init");
+lateCheck();
 
-const assignPlace = (folder) => {
-  const numOfItems = idGet("init");
-  const myFolder = folderGet("init");
+const assignPlace = () => {
+  const numOfItems = localStorage.length - 1;
   for (let i = 0; i < numOfItems; i += 1) {
-    if (myFolder[i].completed === true) {
-      myFolder[i].place = "completed";
-    } else if (myFolder[i].completed === false) {
-      if (myFolder[i].late === true) {
-        myFolder[i].place = "late";
+    const value = JSON.parse(localStorage.getItem(`${i}`));
+    if (value.completed === true) {
+      value.place = "completed";
+      localStorage.setItem(i.toString(), JSON.stringify(value));
+    } else if (value.completed === false) {
+      if (value.late === true) {
+        value.place = "late";
+        localStorage.setItem(i.toString(), JSON.stringify(value));
       } else {
-        myFolder[i].place = "doing";
+        value.place = "doing";
+        localStorage.setItem(i.toString(), JSON.stringify(value));
       }
     }
   }
-  localStorage.setItem(folder, JSON.stringify(myFolder));
 };
 
-assignPlace("init");
+assignPlace();
 
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
@@ -389,19 +355,19 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-const idSeeCheck = (id, page, folder) => {
-  const checkingValue = requestItem(id, "place", folder);
+const idSeeCheck = (id, page) => {
+  const checkingValue = requestItem(id, "place");
   if (checkingValue === page) {
     return true;
   }
   return false;
 };
 
-function SeePage(id, value, folder) {
-  this.nameItem = requestItem(id, "name", folder);
-  this.timeItem = requestItem(id, "time", folder);
-  this.dateItem = requestItem(id, "date", folder);
-  this.textItem = requestItem(id, "text", folder);
+function SeePage(id, value) {
+  this.nameItem = requestItem(id, "name");
+  this.timeItem = requestItem(id, "time");
+  this.dateItem = requestItem(id, "date");
+  this.textItem = requestItem(id, "text");
 
   this.page = methods.divCreate("", `page-${value}`);
   this.page.id = "see";
@@ -498,21 +464,16 @@ const choosePage = () => {
   return choose;
 };
 
-const EleNum = (page, folder) => {
-  const numOfEl = idGet("init");
+const EleNum = (page) => {
+  const numOfEl = localStorage.length - 1;
   const idOfItems = [];
-  const folderItem = folderGet(folder);
   for (let i = 0; i < numOfEl; i += 1) {
-    const items = folderItem[i];
+    const items = JSON.parse(localStorage.getItem(i.toString()));
     if (items.place === page) {
       idOfItems.push(i.toString());
     }
   }
-  if (idOfItems.length === 0) {
-  }
-  if (idOfItems.length === 0) {
-    idOfItems.push(0);
-  }
+
   return idOfItems;
 };
 
@@ -523,12 +484,9 @@ const checkBox = () => {
   });
 };
 
-const seePage = (id, value, page, folder) => {
-  const chosen = new SeePage(id, value, folder);
-  if (
-    idSeeCheck(id, page, folder) === false &&
-    EleNum(page, "init").length === 0
-  ) {
+const seePage = (id, value, page) => {
+  const chosen = new SeePage(id, value);
+  if (idSeeCheck(id, page) === false && EleNum(page).length === 0) {
     chosen.name.innerHTML = "";
     chosen.time.innerHTML = "";
     chosen.date.innerHTML = "";
@@ -570,10 +528,11 @@ if (navbar() && content()) {
 }
 const chooseS = choosePage();
 
-const mainLoader = (folder) => {
+const mainLoader = () => {
   const doing = main.children["1"].children["0"];
   const late = main.children["1"].children["1"];
   const completed = main.children["1"].children["2"];
+
   doing.innerHTML = "";
   late.innerHTML = "";
   completed.textContent = "";
@@ -582,27 +541,26 @@ const mainLoader = (folder) => {
   late.append(cardsInner.lateH4);
   completed.append(cardsInner.completedH4);
 
-  const DoingArr = EleNum("doing", "init");
-  const LateArr = EleNum("late", "init");
-  const CompletedArr = EleNum("completed", "init");
+  const DoingArr = EleNum("doing");
+  const LateArr = EleNum("late");
+  const CompletedArr = EleNum("completed");
   const mainDoingArr = [];
   const mainLateArr = [];
   const mainCompletedArr = [];
-  const myFolder = JSON.parse(localStorage.getItem(folder));
   for (let i = 0; i < 5; i += 1) {
     if (DoingArr.length !== 0 && DoingArr.length > i) {
-      const toPush = myFolder[DoingArr[i]];
+      const toPush = JSON.parse(localStorage.getItem(DoingArr[i]));
       mainDoingArr.push(toPush.name);
     }
 
     if (LateArr.length !== 0 && LateArr.length > i) {
-      const toPush = myFolder[LateArr[i]];
+      const toPush = JSON.parse(localStorage.getItem(LateArr[i]));
       mainLateArr.push(toPush.name);
     }
 
     if (CompletedArr.length !== 0 && CompletedArr.length > i) {
-      const toPush = myFolder[CompletedArr[i]];
-      mainCompletedArr.push(toPush.name);
+      const toPush = JSON.parse(localStorage.getItem(CompletedArr[i]));
+      mainCompletedArr[mainCompletedArr.length] = toPush.name;
     }
 
     //
@@ -629,59 +587,59 @@ const mainLoader = (folder) => {
   }
 };
 
-mainLoader("init");
+mainLoader();
 
-const seeBtnsLogic = (value, id, page, folder) => {
+const seeBtnsLogic = (value, id, page) => {
   const field = value.children["0"];
   const next = checkPage(value).nextBtn;
   const prev = checkPage(value).prevBtn;
   const deleter = checkPage(value).deleteBtn;
   let currId = id;
-  const arrUsable = EleNum(page, "init");
+  const arrUsable = EleNum(page);
   next.addEventListener("click", () => {
-    checkIfId("init");
+    checkIfId();
     if (currId < arrUsable.length - 1) {
       currId += 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
+        seePage(arrUsable[currId], "see", page).myField,
         field.children["1"]
       );
     } else if (currId === arrUsable.length - 1) {
       currId = 0;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
+        seePage(arrUsable[currId], "see", page).myField,
         field.children["1"]
       );
     }
   });
   prev.addEventListener("click", () => {
-    checkIfId("init");
+    checkIfId();
     if (currId > 0) {
       currId -= 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
+        seePage(arrUsable[currId], "see", page).myField,
         field.children["1"]
       );
     } else if (currId === 0) {
       currId = arrUsable.length - 1;
       field.removeChild(field.children["1"]);
       field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
+        seePage(arrUsable[currId], "see", page).myField,
         field.children["1"]
       );
     }
   });
   deleter.addEventListener("click", () => {
-    if (parseInt(idGet("init"), 10) < 0) {
+    if (parseInt(idGet(), 10) !== 0) {
       const confirms = confirm("Do you really want to delete this note");
       if (confirms) {
-        deleteItem(currId, "init");
+        deleteItem(currId);
         field.removeChild(field.children["1"]);
         field.insertBefore(
-          seePage(arrUsable[currId], "see", page, folder).myField,
+          seePage(arrUsable[currId], "see", page).myField,
           field.children["1"]
         );
       }
@@ -694,7 +652,7 @@ const writeSubmit = (value) => {
   submit.addEventListener("click", () => {
     const writeP = writePage();
     const form = writeP.children[1];
-    const nowId = idGet("init");
+    const nowId = idGet();
     const fieldCont = value.children[0];
     const submitBtn = value.children[0].children["2"];
     const input = value.children[0].children["1"].children["0"].children["1"];
@@ -714,11 +672,12 @@ const writeSubmit = (value) => {
       compVal,
       textA.value
     );
-    localItem(Item, nowId, "init");
-    itemSet("init", "Id", parseInt(nowId, 10));
-    checkIfId("init");
-    lateCheck("init");
-    assignPlace("init");
+    localItem(Item, nowId);
+    let changeId = parseInt(nowId, 10);
+    idSet((changeId += 1));
+    checkIfId();
+    lateCheck();
+    assignPlace();
     fieldCont.removeChild(fieldCont.children[1]);
     fieldCont.insertBefore(form, submitBtn);
     checkBox();
@@ -731,23 +690,22 @@ const returnBtn = (value) => {
   returnBtns.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(value);
-    checkIfId("init");
-    assignPlace("init");
-    lateCheck("init");
-    mainLoader("init");
+    checkIfId();
+    assignPlace();
+    lateCheck();
+    mainLoader();
   });
   return returnBtns;
 };
 
-const writeLoader = (btn, page, value, returnPage, folder) => {
+const writeLoader = (btn, page, value, returnPage) => {
   let parameter = btn;
-  console.l;
   const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
   Loadedpage.addEventListener("click", () => {
     src.innerHTML = "";
     src.append(page);
     returnBtn(returnPage);
-    seeBtnsLogic(value, 0, btn, folder);
+    seeBtnsLogic(value, 0, btn);
   });
 };
 
@@ -769,78 +727,70 @@ addBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(writePage());
   checkBox();
-  checkIfId("init");
+  checkIfId();
   writeSubmit(src);
-  mainLoader("init");
+  mainLoader();
   returnBtn(main);
 });
 
 doingCard.addEventListener("click", () => {
-  checkIfId("init");
+  checkIfId();
   writeLoader(
     "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
+    seePage(EleNum("doing")["0"], "see", "doing").myPage,
     src,
-    main,
-    "init"
+    main
   );
-  mainLoader("init");
+  mainLoader();
 });
 
 lateCard.addEventListener("click", () => {
-  checkIfId("init");
+  checkIfId();
   writeLoader(
     "late",
-    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
+    seePage(EleNum("late")["0"], "see", "late").myPage,
     src,
-    main,
-    "init"
+    main
   );
-  mainLoader("init");
+  mainLoader();
 });
 
 completedCard.addEventListener("click", () => {
-  checkIfId("init");
+  checkIfId();
   writeLoader(
     "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
-      .myPage,
+    seePage(EleNum("completed")["0"], "see", "completed").myPage,
     src,
-    main,
-    "init"
+    main
   );
-  mainLoader("init");
+  mainLoader();
 });
 
 seeBtn.addEventListener("click", () => {
   src.innerHTML = "";
   src.append(chooseS);
 
-  checkIfId("init");
+  checkIfId();
 
   writeLoader(
     "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
+    seePage(EleNum("doing")["0"], "see", "doing").myPage,
     src,
-    chooseS,
-    "init"
+    chooseS
   );
   writeLoader(
     "late",
-    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
+    seePage(EleNum("late")["0"], "see", "late").myPage,
     src,
-    chooseS,
-    "init"
+    chooseS
   );
   writeLoader(
     "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
-      .myPage,
+    seePage(EleNum("completed")["0"], "see", "completed").myPage,
     src,
-    chooseS,
-    "init"
+    chooseS
   );
-  mainLoader("init");
+  mainLoader();
   returnBtn(main);
 });
 
