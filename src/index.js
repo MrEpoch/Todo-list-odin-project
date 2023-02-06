@@ -4,106 +4,21 @@ import "./components/fonts/Demiths-L3oRZ.otf";
 
 const src = methods.divCreate("", "src");
 
-const valueLoop = (folderArr, value) => {
-  for (let i = 0; i < folderArr.length; i += 1) {
-    if (folderArr[i].id) {
-      const val = folderArr[i];
-      return { val, i };
-    }
+let folderContainer;
+
+function folderCheck() {
+  if (localStorage.length === 0) {
+    folderContainer = {};
+    folderContainer.main = {};
+    localStorage.setItem("folderContainer", folderContainer);
+  } else {
+    const folders = JSON.parse(localStorage.getItem("folderContainer"));
+    folderContainer = folders; 
   }
-  return false;
-};
-
-const folderGet = (folder) => {
-  const thisFolder = JSON.parse(localStorage.getItem(folder));
-  return thisFolder;
-};
-
-const storageFolder = (folderName) => {
-  if (!folderGet(folderName)) {
-    const myFolder = [];
-    localStorage.setItem(folderName, JSON.stringify(myFolder));
-  }
-};
-
-storageFolder("init");
-
-const idGet = (folder) => {
-  const myFolder = folderGet(folder);
-  const idCalled = myFolder.length;
-  return idCalled;
-};
-
-const itemSet = (folder, value, increase) => {
-  const myFolder = folderGet(folder);
-  if (value === "Id") {
-    const newId = increase;
-    myFolder[valueLoop(myFolder, "Id").i].id = newId.toString();
-  }
-  localStorage.clear();
-  localStorage.setItem(folder, JSON.stringify(myFolder));
-};
-
-function localItem(itemObject, id, folder) {
-  const folderTake = folderGet(folder);
-  folderTake[id] = itemObject;
-  localStorage.setItem(folder, JSON.stringify(folderTake));
 }
 
-const checkIfId = (folder) => {
-  const myFolder = folderGet(folder);
-  if (
-    !valueLoop(myFolder, "Id").val ||
-    parseInt(valueLoop(myFolder, "Id").val.id, 10) < 0
-  ) {
-    localStorage.clear();
-    myFolder.push({ id: "0" });
-    localStorage.setItem(folder, JSON.stringify(myFolder));
-    return false;
-  }
-  return true;
-};
 
-checkIfId("init");
 
-idGet("init");
-
-const deleteItem = (id, folder) => {
-  const myFolder = JSON.parse(localStorage.getItem(folder));
-  if (parseInt(idGet(), 10) > 1) {
-    const newId = parseInt(idGet(), 10) - 1;
-    localStorage.clear();
-    const folderLength = parseInt(idGet(), 10);
-    myFolder.splice(parseInt(id, 10), 1);
-    localStorage.setItem(folder, JSON.stringify(myFolder));
-  }
-};
-
-const requestItem = (ids, item, folder) => {
-  const myFolder = folderGet(folder);
-  if (!myFolder[ids].id) {
-    if (!myFolder[ids] || !myFolder[ids][item]) {
-      return "empty";
-    }
-  }
-
-  const requestedItem = myFolder[ids][item];
-  return requestedItem;
-};
-
-function NewItem(name, time, date, completed, text) {
-  this.name = name;
-  this.time = time;
-  this.date = date;
-  this.completed = completed;
-  this.text = text;
-}
-
-function LoadH(hType, hValue) {
-  const loaderH3 = methods.methodCreate(hType, hValue, "function-loaded-h3");
-
-  return loaderH3;
-}
 
 const lateCheck = (folder) => {
   const dateContainer = [];
@@ -160,26 +75,6 @@ const lateCheck = (folder) => {
   localStorage.setItem(folder, JSON.stringify(folderItem));
 };
 
-lateCheck("init");
-
-const assignPlace = (folder) => {
-  const numOfItems = idGet("init");
-  const myFolder = folderGet("init");
-  for (let i = 0; i < numOfItems; i += 1) {
-    if (myFolder[i].completed === true) {
-      myFolder[i].place = "completed";
-    } else if (myFolder[i].completed === false) {
-      if (myFolder[i].late === true) {
-        myFolder[i].place = "late";
-      } else {
-        myFolder[i].place = "doing";
-      }
-    }
-  }
-  localStorage.setItem(folder, JSON.stringify(myFolder));
-};
-
-assignPlace("init");
 
 const checkPage = (value) => {
   const currentPage = value.children["0"].id;
@@ -389,21 +284,9 @@ function WritingPages(pageName) {
   this.page.append(this.returnBtn, this.field, TodoSubmit(`${pageName}`));
 }
 
-const idSeeCheck = (id, page, folder) => {
-  const checkingValue = requestItem(id, "place", folder);
-  if (checkingValue === page) {
-    return true;
-  }
-  return false;
-};
+function SeePage() {
 
-function SeePage(id, value, folder) {
-  this.nameItem = requestItem(id, "name", folder);
-  this.timeItem = requestItem(id, "time", folder);
-  this.dateItem = requestItem(id, "date", folder);
-  this.textItem = requestItem(id, "text", folder);
-
-  this.page = methods.divCreate("", `page-${value}`);
+  this.page = methods.divCreate("", `page-see`);
   this.page.id = "see";
 
   this.field = methods.fieldsetCreate("", `field-see`);
@@ -425,13 +308,13 @@ function SeePage(id, value, folder) {
   this.prev = methods.methodCreate("button", "previus", "btn-prev");
 
   this.name = methods.divCreate("Name:", "item-name");
-  this.name.append(LoadH("h3", this.nameItem));
+  this.name.append(methods.methodCreate("h3", this.nameItem));
   this.time = methods.divCreate("Time:", "item-time");
-  this.time.append(LoadH("h3", this.timeItem));
+  this.time.append(methods.methodCreate("h3", this.timeItem));
   this.date = methods.divCreate("Date:", "item-date");
-  this.date.append(LoadH("h3", this.dateItem));
+  this.date.append(methods.methodCreate("h3", this.dateItem));
   this.text = methods.divCreate("Text:", "item-text");
-  this.text.append(LoadH("h3", this.textItem));
+  this.text.append(methods.methodCreate("h3", this.textItem));
 
   this.field.append(this.name, this.time, this.date, this.text);
 
@@ -498,24 +381,6 @@ const choosePage = () => {
   return choose;
 };
 
-const EleNum = (page, folder) => {
-  const numOfEl = idGet("init");
-  const idOfItems = [];
-  const folderItem = folderGet(folder);
-  for (let i = 0; i < numOfEl; i += 1) {
-    const items = folderItem[i];
-    if (items.place === page) {
-      idOfItems.push(i.toString());
-    }
-  }
-  if (idOfItems.length === 0) {
-  }
-  if (idOfItems.length === 0) {
-    idOfItems.push(0);
-  }
-  return idOfItems;
-};
-
 const checkBox = () => {
   const completed = src.children[0].children["1"].children["4"].children["1"];
   completed.addEventListener("click", () => {
@@ -523,30 +388,8 @@ const checkBox = () => {
   });
 };
 
-const seePage = (id, value, page, folder) => {
-  const chosen = new SeePage(id, value, folder);
-  if (
-    idSeeCheck(id, page, folder) === false &&
-    EleNum(page, "init").length === 0
-  ) {
-    chosen.name.innerHTML = "";
-    chosen.time.innerHTML = "";
-    chosen.date.innerHTML = "";
-    chosen.text.innerHTML = "";
-    chosen.name.append(
-      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
-    );
-    chosen.time.append(
-      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
-    );
-    chosen.date.append(
-      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
-    );
-    chosen.text.append(
-      methods.h3Create(`empty... you don't have any ${page} todo`, "none")
-    );
-  }
-
+const seePage = () => {
+  const chosen = new SeePage();
   const myPage = chosen.page;
   const myField = chosen.field;
   return { myPage, myField };
@@ -554,202 +397,10 @@ const seePage = (id, value, page, folder) => {
 
 //
 
-const errorMess = "Please restart page or contact support!";
-const main = methods.divCreate(
-  methods.h1Create(errorMess, "error"),
-  "main",
-  "main"
-);
-if (navbar() && content()) {
-  main.innerHTML = "";
-  main.append(navbar(), content());
-} else {
-  console.error(
-    "***  navbar() or content() didn't return expected value!  ***"
-  );
-}
+
 const chooseS = choosePage();
-
-const mainLoader = (folder) => {
-  const doing = main.children["1"].children["0"];
-  const late = main.children["1"].children["1"];
-  const completed = main.children["1"].children["2"];
-  doing.innerHTML = "";
-  late.innerHTML = "";
-  completed.textContent = "";
-
-  doing.append(cardsInner.doingH4);
-  late.append(cardsInner.lateH4);
-  completed.append(cardsInner.completedH4);
-
-  const DoingArr = EleNum("doing", "init");
-  const LateArr = EleNum("late", "init");
-  const CompletedArr = EleNum("completed", "init");
-  const mainDoingArr = [];
-  const mainLateArr = [];
-  const mainCompletedArr = [];
-  const myFolder = JSON.parse(localStorage.getItem(folder));
-  for (let i = 0; i < 5; i += 1) {
-    if (DoingArr.length !== 0 && DoingArr.length > i) {
-      const toPush = myFolder[DoingArr[i]];
-      mainDoingArr.push(toPush.name);
-    }
-
-    if (LateArr.length !== 0 && LateArr.length > i) {
-      const toPush = myFolder[LateArr[i]];
-      mainLateArr.push(toPush.name);
-    }
-
-    if (CompletedArr.length !== 0 && CompletedArr.length > i) {
-      const toPush = myFolder[CompletedArr[i]];
-      mainCompletedArr.push(toPush.name);
-    }
-
-    //
-
-    if (mainDoingArr[i]) {
-      doing.append(methods.h5Create(mainDoingArr[i], "h4-doing-pageFill"));
-    } else {
-      doing.append(methods.h5Create("empty", "none"));
-    }
-
-    if (mainLateArr[i]) {
-      late.append(methods.h5Create(mainLateArr[i], "h4-late-pageFill"));
-    } else {
-      late.append(methods.h5Create("empty", "none"));
-    }
-
-    if (mainCompletedArr[i]) {
-      completed.append(
-        methods.h5Create(mainCompletedArr[i], "h4-completed-pageFill")
-      );
-    } else {
-      completed.append(methods.h5Create("empty", "none"));
-    }
-  }
-};
-
-mainLoader("init");
-
-const seeBtnsLogic = (value, id, page, folder) => {
-  const field = value.children["0"];
-  const next = checkPage(value).nextBtn;
-  const prev = checkPage(value).prevBtn;
-  const deleter = checkPage(value).deleteBtn;
-  let currId = id;
-  const arrUsable = EleNum(page, "init");
-  next.addEventListener("click", () => {
-    checkIfId("init");
-    if (currId < arrUsable.length - 1) {
-      currId += 1;
-      field.removeChild(field.children["1"]);
-      field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
-        field.children["1"]
-      );
-    } else if (currId === arrUsable.length - 1) {
-      currId = 0;
-      field.removeChild(field.children["1"]);
-      field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
-        field.children["1"]
-      );
-    }
-  });
-  prev.addEventListener("click", () => {
-    checkIfId("init");
-    if (currId > 0) {
-      currId -= 1;
-      field.removeChild(field.children["1"]);
-      field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
-        field.children["1"]
-      );
-    } else if (currId === 0) {
-      currId = arrUsable.length - 1;
-      field.removeChild(field.children["1"]);
-      field.insertBefore(
-        seePage(arrUsable[currId], "see", page, folder).myField,
-        field.children["1"]
-      );
-    }
-  });
-  deleter.addEventListener("click", () => {
-    if (parseInt(idGet("init"), 10) < 0) {
-      const confirms = confirm("Do you really want to delete this note");
-      if (confirms) {
-        deleteItem(currId, "init");
-        field.removeChild(field.children["1"]);
-        field.insertBefore(
-          seePage(arrUsable[currId], "see", page, folder).myField,
-          field.children["1"]
-        );
-      }
-    }
-  });
-};
-
-const writeSubmit = (value) => {
-  const submit = checkPage(src).submitBtns;
-  submit.addEventListener("click", () => {
-    const writeP = writePage();
-    const form = writeP.children[1];
-    const nowId = idGet("init");
-    const fieldCont = value.children[0];
-    const submitBtn = value.children[0].children["2"];
-    const input = value.children[0].children["1"].children["0"].children["1"];
-    const time = value.children[0].children["1"].children["1"].children["1"];
-    const date = value.children[0].children["1"].children["2"].children["1"];
-    const textA = value.children[0].children["1"].children["3"].children["0"];
-    const completed =
-      value.children[0].children["1"].children["4"].children["1"];
-    let compVal = false;
-    if (completed.classList.contains("done-style")) {
-      compVal = true;
-    }
-    const Item = new NewItem(
-      input.value,
-      time.value,
-      date.value,
-      compVal,
-      textA.value
-    );
-    localItem(Item, nowId, "init");
-    itemSet("init", "Id", parseInt(nowId, 10));
-    checkIfId("init");
-    lateCheck("init");
-    assignPlace("init");
-    fieldCont.removeChild(fieldCont.children[1]);
-    fieldCont.insertBefore(form, submitBtn);
-    checkBox();
-  });
-  return submit;
-};
-
-const returnBtn = (value) => {
-  const returnBtns = checkPage(src).btnLogic;
-  returnBtns.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(value);
-    checkIfId("init");
-    assignPlace("init");
-    lateCheck("init");
-    mainLoader("init");
-  });
-  return returnBtns;
-};
-
-const writeLoader = (btn, page, value, returnPage, folder) => {
-  let parameter = btn;
-  console.l;
-  const Loadedpage = checkPage(value).pageBtns[(parameter += "Btns")];
-  Loadedpage.addEventListener("click", () => {
-    src.innerHTML = "";
-    src.append(page);
-    returnBtn(returnPage);
-    seeBtnsLogic(value, 0, btn, folder);
-  });
-};
+const main = methods.divCreate("", "main");
+main.append(navbar(), content());
 
 src.append(main);
 
@@ -760,88 +411,6 @@ const doingCard = src.children["0"].children["1"].children["0"];
 const lateCard = src.children["0"].children["1"].children["1"];
 const completedCard = src.children["0"].children["1"].children["2"];
 
-doingCard.onpaste = (e) => e.preventDefault();
-lateCard.onpaste = (e) => e.preventDefault();
-completedCard.onpaste = (e) => e.preventDefault();
 
-addBtn.addEventListener("click", () => {
-  addBtn.innerHTML = SvgPict().plusIcon;
-  src.innerHTML = "";
-  src.append(writePage());
-  checkBox();
-  checkIfId("init");
-  writeSubmit(src);
-  mainLoader("init");
-  returnBtn(main);
-});
-
-doingCard.addEventListener("click", () => {
-  checkIfId("init");
-  writeLoader(
-    "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
-    src,
-    main,
-    "init"
-  );
-  mainLoader("init");
-});
-
-lateCard.addEventListener("click", () => {
-  checkIfId("init");
-  writeLoader(
-    "late",
-    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
-    src,
-    main,
-    "init"
-  );
-  mainLoader("init");
-});
-
-completedCard.addEventListener("click", () => {
-  checkIfId("init");
-  writeLoader(
-    "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
-      .myPage,
-    src,
-    main,
-    "init"
-  );
-  mainLoader("init");
-});
-
-seeBtn.addEventListener("click", () => {
-  src.innerHTML = "";
-  src.append(chooseS);
-
-  checkIfId("init");
-
-  writeLoader(
-    "doing",
-    seePage(EleNum("doing", "init")["0"], "see", "doing", "init").myPage,
-    src,
-    chooseS,
-    "init"
-  );
-  writeLoader(
-    "late",
-    seePage(EleNum("late", "init")["0"], "see", "late", "init").myPage,
-    src,
-    chooseS,
-    "init"
-  );
-  writeLoader(
-    "completed",
-    seePage(EleNum("completed", "init")["0"], "see", "completed", "init")
-      .myPage,
-    src,
-    chooseS,
-    "init"
-  );
-  mainLoader("init");
-  returnBtn(main);
-});
 
 document.body.appendChild(src);
